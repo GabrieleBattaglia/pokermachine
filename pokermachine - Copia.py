@@ -90,12 +90,8 @@ def ricostruisci_mazzo(mazzo, mano_corrente):
 	'''
 	Ricostruisce il mazzo senza duplicare le carte in mano o scartate permanentemente.
 	'''
-	# Ricostruisce il mazzo
-	mazzo.costruisci_mazzo()
+	mazzo.CostruisciMazzo()
 	mazzo.JollyNo()
-	mazzo.RimuoviValori([2, 3, 4, 5])
-
-	# Rimuove le carte che sono nella mano corrente
 	carte_in_mano = [carta[1][0] for carta in mano_corrente]
 	mazzo.carte = [carta for carta in mazzo.carte if carta[1][0] not in carte_in_mano]
 
@@ -112,14 +108,13 @@ def poker_machine():
 	fiches = dati['fiches_attuali']
 	mazzo = Mazzo(tipo=True, num_mazzi=1)
 	mazzo.JollyNo()
-	mazzo.RimuoviValori([2, 3, 4, 5])  # Rimuove le carte basse inizialmente
 	print("Mescolamento del mazzo in corso per 3 secondi...")
 	mazzo.MescolaMazzo(3000)
 	mostra_report(dati)
 	print(f"== Benvenuto alla Poker Machine!\n\t by Gabry (IZ4APU). Versione {VERSIONE} ==")
 	numero_mano = dati['mani_giocate'] + 1
 	while fiches > 0:
-		puntata = input(f"Mano #{numero_mano}, Fiches:{fiches}. Quante? ")
+		puntata = input(f"Mano #{numero_mano}, Fiches: {fiches}. Quante? ")
 		if puntata == "":
 			print("Grazie per aver giocato!")
 			dati['fiches_attuali'] = fiches
@@ -128,12 +123,10 @@ def poker_machine():
 			mostra_report(dati)
 			return
 		puntata = int(puntata)
-		CARTE_NECESSARIE = 10  # 5 per la mano iniziale + 5 per le sostituzioni
+		CARTE_NECESSARIE = 10 
 		if len(mazzo.carte) < CARTE_NECESSARIE:
 			print("Le carte stanno per finire. Rimescoliamo gli scarti.")
 			mazzo.Rimescola()
-			mazzo.RimuoviValori([2, 3, 4, 5])
-			# Mescoliamo il mazzo dopo aver reintegrato gli scarti
 			print("Mescolamento del mazzo in corso per 3 secondi...")
 			mazzo.MescolaMazzo(3000)
 			if len(mazzo.carte) < CARTE_NECESSARIE:
@@ -169,7 +162,6 @@ def poker_machine():
 			if len(mazzo.carte) < numero_carte_da_sostituire:
 				print("Le carte stanno per finire. Rimescoliamo gli scarti.")
 				mazzo.Rimescola()
-				mazzo.RimuoviValori([2, 3, 4, 5])
 				print("Mescolamento del mazzo in corso per 3 secondi...")
 				mazzo.MescolaMazzo(3000)
 				if len(mazzo.carte) < numero_carte_da_sostituire:
@@ -184,7 +176,6 @@ def poker_machine():
 			if len(mazzo.carte) < 5:
 				print("Le carte stanno per finire. Rimescoliamo gli scarti.")
 				mazzo.Rimescola()
-				mazzo.RimuoviValori([2, 3, 4, 5])
 				print("Mescolamento del mazzo in corso per 3 secondi...")
 				mazzo.MescolaMazzo(3000)
 				if len(mazzo.carte) < 5:
@@ -234,7 +225,7 @@ def valuta_mano(mano):
 	semi = []
 	valori_numerici = []
 	valori_numerici_seq = []
-	valori_figura = {'Jack': 11, 'Regina': 12, 'Re': 13, 'Asso': 14}  # Asso vale 14 per le coppie
+	valori_figura = {'Jack': 11, 'Regina': 12, 'Re': 13, 'Asso': 14}
 	for _, carta in mano:
 		nome_carta = carta[0]
 		nome_valore, seme_carta = nome_carta.split(' di ')
@@ -244,7 +235,6 @@ def valuta_mano(mano):
 		else:
 			valore = valori_figura.get(nome_valore, 0)
 		valori_numerici.append(valore)
-		# Per le sequenze, consideriamo l'Asso sia come 1 che come 14
 		if nome_valore == 'Asso':
 			valori_numerici_seq.extend([1, 14])
 		else:
@@ -264,10 +254,8 @@ def valuta_mano(mano):
 			if all(sequenza[j] + 1 == sequenza[j + 1] for j in range(4)):
 				return True
 		return False
-
 	def is_colore():
 		return max(conta_semi.values()) >= 5
-
 	if is_sequenza(valori_numerici_seq) and is_colore():
 		if set([10, 11, 12, 13, 14]).issubset(valori_numerici):
 			return "Scala Reale"
@@ -291,7 +279,6 @@ def valuta_mano(mano):
 				return "Coppia pagata"
 		return "Coppia non pagata"
 	return "Carta alta"
-
 def calcola_vincita(punteggio, puntata):
 	tabella_vincite = {
 		"Carta alta": 0,
