@@ -15,6 +15,8 @@ def carica_dati():
 		dati = {
 			'launches': 1,
 			'mani_giocate': 0,
+			'data_ultimo_fallimento': None,
+			'record_mani_senza_fallimenti': 0,
 			'mani_dall_ultimo_fallimento': 0,
 			'fiches_guadagnate': 0,
 			'fiches_perdute': 0,
@@ -55,6 +57,12 @@ def mostra_report(dati):
 	print("== Report ==")
 	print(f"Mani giocate totali: {dati['mani_giocate']}")
 	print(f"Mani dall'ultimo fallimento: {dati['mani_dall_ultimo_fallimento']}")
+	if dati['data_ultimo_fallimento']:
+		data_ultimo_fallimento = datetime.strptime(dati['data_ultimo_fallimento'], "%Y-%m-%d %H:%M:%S")
+		diff_fallimento = relativedelta(datetime.now(), data_ultimo_fallimento)
+		print(f"Ultimo fallimento avvenuto {diff_fallimento.years} anni, {diff_fallimento.months} mesi, "
+								f"{diff_fallimento.days} giorni fa")
+	print(f"Record mani senza fallimenti: {dati['record_mani_senza_fallimenti']}")
 	print(f"Fiches totali guadagnate: {dati['fiches_guadagnate']}")
 	print(f"Fiches totali perdute: {dati['fiches_perdute']}")
 	print(f"Fiches attuali: {dati['fiches_attuali']}")
@@ -90,26 +98,19 @@ def ricostruisci_mazzo(mazzo, mano_corrente):
 	'''
 	Ricostruisce il mazzo senza duplicare le carte in mano o scartate permanentemente.
 	'''
-	mazzo.CostruisciMazzo()
-	mazzo.JollyNo()
+	mazzo = Mazzo(tipo=True, num_mazzi=10)
 	carte_in_mano = [carta[1][0] for carta in mano_corrente]
 	mazzo.carte = [carta for carta in mazzo.carte if carta[1][0] not in carte_in_mano]
-
-	# Rimuove le carte scartate permanentemente
 	carte_scartate_permanenti = [carta[1][0] for carta in mazzo.scarti_permanenti]
 	mazzo.carte = [carta for carta in mazzo.carte if carta[1][0] not in carte_scartate_permanenti]
-
-	# Mescola il mazzo dopo averlo ricostruito
-	print("Mescolamento del mazzo in corso per 3 secondi...")
-	mazzo.MescolaMazzo(3000)
-
+	print("Mescolamento del mazzo in corso per 5 secondi...")
+	mazzo.MescolaMazzo(5000)
 def poker_machine():
 	dati = carica_dati()
 	fiches = dati['fiches_attuali']
-	mazzo = Mazzo(tipo=True, num_mazzi=1)
-	mazzo.JollyNo()
-	print("Mescolamento del mazzo in corso per 3 secondi...")
-	mazzo.MescolaMazzo(3000)
+	mazzo = Mazzo(tipo=True, num_mazzi=10)
+	print("Mescolamento del mazzo in corso per 5 secondi...")
+	mazzo.MescolaMazzo(5000)
 	mostra_report(dati)
 	print(f"== Benvenuto alla Poker Machine!\n\t by Gabry (IZ4APU). Versione {VERSIONE} ==")
 	numero_mano = dati['mani_giocate'] + 1
@@ -123,12 +124,11 @@ def poker_machine():
 			mostra_report(dati)
 			return
 		puntata = int(puntata)
-		CARTE_NECESSARIE = 10 
 		if len(mazzo.carte) < CARTE_NECESSARIE:
 			print("Le carte stanno per finire. Rimescoliamo gli scarti.")
 			mazzo.Rimescola()
-			print("Mescolamento del mazzo in corso per 3 secondi...")
-			mazzo.MescolaMazzo(3000)
+			print("Mescolamento del mazzo in corso per 5 secondi...")
+			mazzo.MescolaMazzo(5000)
 			if len(mazzo.carte) < CARTE_NECESSARIE:
 				print("Non ci sono abbastanza carte per continuare. Ricostruiamo il mazzo.")
 				ricostruisci_mazzo(mazzo, [])
@@ -162,8 +162,8 @@ def poker_machine():
 			if len(mazzo.carte) < numero_carte_da_sostituire:
 				print("Le carte stanno per finire. Rimescoliamo gli scarti.")
 				mazzo.Rimescola()
-				print("Mescolamento del mazzo in corso per 3 secondi...")
-				mazzo.MescolaMazzo(3000)
+				print("Mescolamento del mazzo in corso per 5 secondi...")
+				mazzo.MescolaMazzo(5000)
 				if len(mazzo.carte) < numero_carte_da_sostituire:
 					print("Non ci sono abbastanza carte per sostituire le tue carte. Ricostruiamo il mazzo.")
 					ricostruisci_mazzo(mazzo, mano)
@@ -176,8 +176,8 @@ def poker_machine():
 			if len(mazzo.carte) < 5:
 				print("Le carte stanno per finire. Rimescoliamo gli scarti.")
 				mazzo.Rimescola()
-				print("Mescolamento del mazzo in corso per 3 secondi...")
-				mazzo.MescolaMazzo(3000)
+				print("Mescolamento del mazzo in corso per 5 secondi...")
+				mazzo.MescolaMazzo(5000)
 				if len(mazzo.carte) < 5:
 					print("Non ci sono abbastanza carte per continuare. Ricostruiamo il mazzo.")
 					ricostruisci_mazzo(mazzo, mano)
@@ -209,7 +209,11 @@ def poker_machine():
 		numero_mano += 1
 		if fiches <= 0:
 			print("Hai esaurito le fiches. Grazie per aver giocato!")
+			if dati['mani_dall_ultimo_fallimento'] > dati['record_mani_senza_fallimenti']:
+				dati['record_mani_senza_fallimenti'] = dati['mani_dall_ultimo_fallimento']
 			dati['fiches_attuali'] = fiches
+			dati['mani_dall_ultimo_fallimento'] = 0
+			dati['data_ultimo_fallimento'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 			dati['mani_dall_ultimo_fallimento'] = 0
 			dati['data_ultima_giocata'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 			salva_dati(dati)
@@ -296,6 +300,7 @@ def calcola_vincita(punteggio, puntata):
 	moltiplicatore = tabella_vincite.get(punteggio, 0)
 	return puntata * moltiplicatore
 
-VERSIONE="1.0.0 del 4 ottobre 2024"
+VERSIONE="1.2.1 del 4 ottobre 2024"
+CARTE_NECESSARIE = 10
 if __name__ == "__main__":
 	poker_machine()
