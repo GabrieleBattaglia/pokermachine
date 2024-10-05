@@ -9,8 +9,7 @@ Il mazzo di carte viene gestito tramite una classe personalizzata, `Mazzo`, che 
 ## Funzionalità
 
 - **Gestione delle carte**:
-  - Un mazzo di carte francesi (con o senza jolly).
-  - Rimozione delle carte basse (2, 3, 4, 5) per mantenere il gioco più orientato al poker.
+  - Un mazzo di carte francesi (senza jolly).
   - Possibilità di reintegrare gli scarti quando le carte stanno per finire.
   - Mescolamento del mazzo solo quando necessario (inizio partita o reintegrazione degli scarti).
 
@@ -48,10 +47,14 @@ Per eseguire la **Poker Machine**, è necessario avere installato Python 3.6+ su
    python pokermachine.py
    ```
 
+   Oppure, dalla cartella dist del progetto, prelevate l'eseguibile.
+
+
 4. **Giocare**:
 
    - Inserisci la tua puntata o premi Enter per uscire.
    - Scegli quali carte mantenere inserendo i numeri delle carte (senza spazi) o premi Enter per sostituirle tutte.
+   Ad esempio, per tenere la prima, la quarta e la quinta carta scrivi 145 e batti invio.
    - Continua a giocare fino a esaurire le fiches o fino a quando desideri uscire.
 
 ## Regole del Gioco
@@ -83,7 +86,7 @@ Per eseguire la **Poker Machine**, è necessario avere installato Python 3.6+ su
   
 ## Come Funziona
 
-1. **Creazione del Mazzo**: All'inizio del gioco, viene creato un mazzo con 52 carte (senza jolly) e vengono rimosse le carte di valore basso (2, 3, 4, 5).
+1. **Creazione del Mazzo**: All'inizio del gioco, viene creato un mazzo con 520 carte (10 mazzi senza jolly).
    
 2. **Gioco**: In ogni mano, puoi piazzare una puntata e ricevere 5 carte. Puoi scegliere di mantenerne alcune o cambiarle.
    
