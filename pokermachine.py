@@ -42,6 +42,8 @@ def carica_dati():
 			'data_perdita_massima': None,
 			'data_ultima_giocata': None
 		}
+	if 'killer_hand_count' not in dati:
+		dati['killer_hand_count'] = 0
 	if dati['fiches_attuali'] <= 0:
 		print("Le fiches sono state esaurite. Ricevi 100 fiches.")
 		dati['fiches_attuali'] = 100
@@ -231,6 +233,7 @@ def poker_machine():
 			dati['fiches_attuali'] = fiches
 			dati['mani_dall_ultimo_fallimento'] = 0
 			dati['data_ultimo_fallimento'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+			dati['killer_hand_count'] = 0
 			dati['data_ultima_giocata'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 			salva_dati(dati)
 			mostra_report(dati)
@@ -320,6 +323,6 @@ KILLER_HAND_FREQUENZA = 20
 PERCENTUALE_MINIMA_PUNTATA = 0.10  # Puntata minima del 10% delle F
 penalita_killer_hand = 10
 MAX_PENALITA_KH = 90
-VERSIONE="2.0.4 del 6 ottobre 2024"
+VERSIONE="2.0.6 del 6 ottobre 2024"
 if __name__ == "__main__":
 	poker_machine()
