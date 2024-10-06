@@ -121,7 +121,11 @@ def poker_machine():
 			killer_hand_count += 1
 			penalita_attuale = min(killer_hand_count * 10, MAX_PENALITA_KH)
 			print(f"Attenzione! Questa è una Killer Hand (mano speciale #{numero_mano}). Se perdi, perderai il {penalita_attuale}% delle tue fiches!")
-		puntata = input(f"Mano #{numero_mano}, Fiches: {fiches}. Quante? ")
+		puntata=""
+		while True:
+			puntata = input(f"Mano #{numero_mano}, Fiches: {fiches}. Quante? ")
+			if (puntata == "" or puntata.isdigit() or (len(puntata) == 1 and puntata in '-.,;+')): break
+			else: print("Inserisci il numero di fiches che vuoi puntare o usa una scorciatoia:\n\t- 10% , 25% . 50% ; 75% + 100%.")
 		if puntata == "":
 			print("Grazie per aver giocato!")
 			dati['fiches_attuali'] = fiches
@@ -130,6 +134,11 @@ def poker_machine():
 			salva_dati(dati)
 			mostra_report(dati)
 			return
+		elif puntata=="-": puntata=int(fiches/100*10)
+		elif puntata=="+": puntata=int(fiches)
+		elif puntata==".": puntata=int(fiches/100*50)
+		elif puntata==",": puntata=int(fiches/100*25)
+		elif puntata==";": puntata=int(fiches/100*75)
 		puntata_minima = max(int(fiches * PERCENTUALE_MINIMA_PUNTATA), 1)
 		if int(puntata) < puntata_minima:
 			print(f"La puntata è inferiore al 10%, corretta con {puntata_minima}.")
@@ -323,6 +332,6 @@ KILLER_HAND_FREQUENZA = 20
 PERCENTUALE_MINIMA_PUNTATA = 0.10  # Puntata minima del 10% delle F
 penalita_killer_hand = 10
 MAX_PENALITA_KH = 90
-VERSIONE="2.0.6 del 6 ottobre 2024"
+VERSIONE="2.1.1 del 6 ottobre 2024"
 if __name__ == "__main__":
 	poker_machine()
