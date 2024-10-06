@@ -22,6 +22,7 @@ def carica_dati():
 			'fiches_perdute': 0,
 			'fiches_attuali': 100,
 			'fallimenti': 0,
+			'killer_hand_count': 0,
 			'punteggi': {
 				"Carta alta": {'conteggio': 0, 'ultima_realizzazione': None},
 				"Coppia non pagata": {'conteggio': 0, 'ultima_realizzazione': None},
@@ -109,9 +110,9 @@ def poker_machine():
 	print("Mescolamento del mazzo in corso per 5 secondi...")
 	mazzo.MescolaMazzo(5000)
 	mostra_report(dati)
-	print(f"== Benvenuto alla Poker Machine!\n\t by Gabry (IZ4APU). Versione {VERSIONE} ==")
+	print(f"== Benvenuto alla Poker Machine!\n\tVersione {VERSIONE} by Gabry (IZ4APU). ==")
 	numero_mano = dati['mani_dall_ultimo_fallimento'] + 1
-	killer_hand_count = 0
+	killer_hand_count = dati['killer_hand_count']
 	while fiches > 0:
 		is_mano_speciale = (numero_mano % KILLER_HAND_FREQUENZA == 0)
 		if is_mano_speciale:
@@ -123,6 +124,7 @@ def poker_machine():
 			print("Grazie per aver giocato!")
 			dati['fiches_attuali'] = fiches
 			dati['data_ultima_giocata'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+			dati['killer_hand_count'] = killer_hand_count  
 			salva_dati(dati)
 			mostra_report(dati)
 			return
@@ -318,6 +320,6 @@ KILLER_HAND_FREQUENZA = 20
 PERCENTUALE_MINIMA_PUNTATA = 0.10  # Puntata minima del 10% delle F
 penalita_killer_hand = 10
 MAX_PENALITA_KH = 90
-VERSIONE="2.0.2 del 5 ottobre 2024"
+VERSIONE="2.0.4 del 6 ottobre 2024"
 if __name__ == "__main__":
 	poker_machine()
