@@ -53,6 +53,14 @@ Per eseguire la **Poker Machine**, è necessario avere installato Python 3.6+ su
 4. **Giocare**:
 
    - Inserisci la tua puntata o premi Enter per uscire.
+    Sono attive anche delle **scorciatoie** per inserire le puntate oltre, naturalmente, allo scrivere a mano la quantità di fiches da puntare.
+    Nello specifico potrai:
+    - Inserire un "-" per puntare il 10%;
+    - oppure una "," per puntare il 25%;
+    - o ancora un bel "." per puntare la metà di ciò che possiedi;
+    - o se ti senti coraggioso, con un ";" punterai il 75%;
+    - e per finire la follia pura, un bel "+" ti farà puntare tutto il capitale.
+    
    - Scegli quali carte mantenere inserendo i numeri delle carte (senza spazi) o premi Enter per sostituirle tutte.
    Ad esempio, per tenere la prima, la quarta e la quinta carta scrivi 145 e batti invio.
    - Continua a giocare fino a esaurire le fiches o fino a quando desideri uscire.
