@@ -20,7 +20,7 @@ def carica_dati():
 			'mani_dall_ultimo_fallimento': 0,
 			'fiches_guadagnate': 0,
 			'fiches_perdute': 0,
-			'fiches_attuali': 100,
+			'fiches_attuali': 200,
 			'fallimenti': 0,
 			'killer_hand_count': 0,
 			'punteggi': {
@@ -33,6 +33,7 @@ def carica_dati():
 				"Colore": {'conteggio': 0, 'ultima_realizzazione': None},
 				"Full": {'conteggio': 0, 'ultima_realizzazione': None},
 				"Poker": {'conteggio': 0, 'ultima_realizzazione': None},
+				"Super Poker": {'conteggio': 0, 'ultima_realizzazione': None},
 				"Scala a colore": {'conteggio': 0, 'ultima_realizzazione': None},
 				"Scala Reale": {'conteggio': 0, 'ultima_realizzazione': None}
 			},
@@ -44,10 +45,12 @@ def carica_dati():
 		}
 	if 'killer_hand_count' not in dati:
 		dati['killer_hand_count'] = 0
+	if 'Super Poker' not in dati['punteggi']:
+		dati['punteggi']['Super Poker'] = {'conteggio': 0, 'ultima_realizzazione': None}
 	if dati['fiches_attuali'] <= 0:
-		print("Le fiches sono state esaurite. Ricevi 100 fiches.")
-		dati['fiches_attuali'] = 100
-		dati['fiches_perdute'] -= 100
+		print("Le fiches sono state esaurite. Ricevi 200 fiches.")
+		dati['fiches_attuali'] = 200
+		dati['fiches_perdute'] -= 200
 		dati['fallimenti'] += 1
 		dati['mani_dall_ultimo_fallimento'] = 0
 	return dati
@@ -115,18 +118,21 @@ def poker_machine():
 	print(f"== Benvenuto alla Poker Machine!\n\tVersione {VERSIONE} by Gabry (IZ4APU). ==")
 	numero_mano = dati['mani_dall_ultimo_fallimento'] + 1
 	killer_hand_count = dati['killer_hand_count']
+	saldo_iniziale=fiches
 	while fiches > 0:
 		is_mano_speciale = (numero_mano % KILLER_HAND_FREQUENZA == 0)
 		if is_mano_speciale:
 			killer_hand_count += 1
 			penalita_attuale = min(killer_hand_count * 10, MAX_PENALITA_KH)
-			print(f"Attenzione! Questa è una Killer Hand (mano speciale #{numero_mano}). Se perdi, perderai il {penalita_attuale}% delle tue fiches!")
+			print(f"Attenzione! Questa è una Killer Hand (mano speciale #{numero_mano}). Se perdi, perderai il {penalita_attuale}% delle tue fiches!\nSe la sconfiggi triplicherai la tua puntata!")
 		puntata=""
 		while True:
 			puntata = input(f"Mano #{numero_mano}, Fiches: {fiches}. Quante? ")
 			if (puntata == "" or puntata.isdigit() or (len(puntata) == 1 and puntata in '-.,;+')): break
 			else: print("Inserisci il numero di fiches che vuoi puntare o usa una scorciatoia:\n\t- 10% , 25% . 50% ; 75% + 100%.")
 		if puntata == "":
+			if fiches>0:
+				print(f"Hai iniziato con {saldo_iniziale} e concludi con {fiches}, pari al {fiches*100/saldo_iniziale:.1f}%.")
 			print("Grazie per aver giocato!")
 			dati['fiches_attuali'] = fiches
 			dati['data_ultima_giocata'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -141,8 +147,11 @@ def poker_machine():
 		elif puntata==";": puntata=int(fiches/100*75)
 		puntata_minima = max(int(fiches * PERCENTUALE_MINIMA_PUNTATA), 1)
 		if int(puntata) < puntata_minima:
-			print(f"La puntata è inferiore al 10%, corretta con {puntata_minima}.")
+			print(f"La puntata è inferiore al 3%, corretta con {puntata_minima}.")
 			puntata = puntata_minima
+		elif int(puntata)<1:
+			puntata=1
+			print("Devi puntare almeno 1.")
 		else:
 			puntata = int(puntata)
 		if len(mazzo.carte) < CARTE_NECESSARIE:
@@ -209,11 +218,16 @@ def poker_machine():
 			print(carta[0])
 		punteggio = valuta_mano(mano)
 		vincita = calcola_vincita(punteggio, puntata)
-		print(f"Risultato ottenuto: puntata {puntata}, {punteggio}, vincita: {vincita-puntata} fiches.")
+		bilancio = "vinci" if vincita-puntata > 0 else "vai in pari" if vincita-puntata == 0 else "perdi"
+		print(f"Hai puntato {puntata}, realizzi {punteggio} e {bilancio} {vincita-puntata} fiches.")
 		if is_mano_speciale and vincita < puntata:
 			perdita_kh = int(fiches * (penalita_attuale / 100))
 			fiches -= perdita_kh
 			print(f"Hai perso la Killer Hand! Perdi il {penalita_attuale}% delle tue fiches: {perdita_kh}.")
+		if is_mano_speciale and vincita > puntata:
+			guadagno_kh = puntata*3
+			fiches += guadagno_kh
+			print(f"Hai superato la Killer Hand! Guadagni un bonus speciale di {guadagno_kh}.")
 		if vincita > 0:
 			fiches += (vincita - puntata)
 			dati['fiches_guadagnate'] += vincita
@@ -277,7 +291,6 @@ def valuta_mano(mano):
 	conta_semi = {}
 	for s in semi:
 		conta_semi[s] = conta_semi.get(s, 0) + 1
-
 	def is_sequenza(valori):
 		valori_unici = sorted(set(valori))
 		for i in range(len(valori_unici) - 4):
@@ -292,6 +305,9 @@ def valuta_mano(mano):
 			return "Scala Reale"
 		else:
 			return "Scala a colore"
+	max_same_value = max(conta_valori.values())
+	if max_same_value >= 5:
+		return "Super Poker"
 	if 4 in conta_valori.values():
 		return "Poker"
 	if sorted(conta_valori.values()) == [2, 3]:
@@ -321,17 +337,18 @@ def calcola_vincita(punteggio, puntata):
 		"Colore": 6,
 		"Full": 9,
 		"Poker": 25,
-		"Scala a colore": 50,
+		"Super Poker": 40,
+		"Scala a colore": 55,
 		"Scala Reale": 250
 	}
 	moltiplicatore = tabella_vincite.get(punteggio, 0)
 	return puntata * moltiplicatore
 
 CARTE_NECESSARIE = 10
-KILLER_HAND_FREQUENZA = 20
-PERCENTUALE_MINIMA_PUNTATA = 0.10  # Puntata minima del 10% delle F
+KILLER_HAND_FREQUENZA = 25
+PERCENTUALE_MINIMA_PUNTATA = 0.03
 penalita_killer_hand = 10
 MAX_PENALITA_KH = 90
-VERSIONE="2.1.1 del 6 ottobre 2024"
+VERSIONE="2.3.0 del 8 ottobre 2024"
 if __name__ == "__main__":
 	poker_machine()
