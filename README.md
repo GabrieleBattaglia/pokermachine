@@ -71,6 +71,7 @@ Per eseguire la **Poker Machine**, è necessario avere installato Python 3.6+ su
 - I punteggi possibili sono:
   - **Scala Reale**
   - **Scala a Colore**
+  - **Super Poker**
   - **Poker**
   - **Full**
   - **Colore**
@@ -83,7 +84,7 @@ Per eseguire la **Poker Machine**, è necessario avere installato Python 3.6+ su
   
   Ogni combinazione assegna una vincita differente in base alla puntata.
 
-  Ogni 20 mani arriva una Killer Hand. La killer Hand funziona in questo modo: se il giocatore vince o va in pari, ad esempio con una coppia pagata, non succede nulla e quella KH è sconfitta. Se però va in perdita, oltre alla puntata il giocatore perde anche il 10% delle fiches. Via via che il gioco aumenta, la KH diviene sempre più pesante fino a provocare una possibile perdita del 90% delle fiches accumulate.
+  Ogni 25 mani arriva una Killer Hand. La killer Hand funziona in questo modo: se il giocatore vince, triplica la sua puntata, se va in pari ad esempio con una coppia pagata, non succede nulla e quella KH è sconfitta. Se però va in perdita, oltre alla puntata il giocatore perde anche il 10% delle fiches. Via via che il gioco aumenta, la KH diviene sempre più pesante fino a provocare una possibile perdita del 90% delle fiches accumulate.
   State attenti!
 
 ## Struttura del Progetto
