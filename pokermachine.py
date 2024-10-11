@@ -115,7 +115,7 @@ def poker_machine():
 	print("Mescolamento del mazzo in corso per 5 secondi...")
 	mazzo.MescolaMazzo(5000)
 	mostra_report(dati)
-	print(f"== Benvenuto alla Poker Machine!\n\tVersione {VERSIONE} by Gabry (IZ4APU). ==")
+	print(f"== Benvenuto alla Poker Machine!\n\tVersione {VERSIONE} by Gabriele Battaglia (IZ4APU). ==\n\t\tLancio App #{dati['launches']}.")
 	numero_mano = dati['mani_dall_ultimo_fallimento'] + 1
 	killer_hand_count = dati['killer_hand_count']
 	saldo_iniziale=fiches
@@ -349,6 +349,6 @@ KILLER_HAND_FREQUENZA = 25
 PERCENTUALE_MINIMA_PUNTATA = 0.03
 penalita_killer_hand = 10
 MAX_PENALITA_KH = 90
-VERSIONE="2.3.0 del 8 ottobre 2024"
+VERSIONE="2.3.1 del 10 ottobre 2024"
 if __name__ == "__main__":
 	poker_machine()
