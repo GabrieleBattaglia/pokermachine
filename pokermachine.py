@@ -93,7 +93,13 @@ def mostra_report(dati):
 		if ultima_realizzazione:
 			data_ultima = datetime.strptime(ultima_realizzazione, "%Y-%m-%d %H:%M:%S")
 			diff = relativedelta(ora, data_ultima)
-			tempo_trascorso = (f"{diff.years} anni, {diff.months} mesi e {diff.days} giorni fa")
+			if diff.years>0: t1 = f"{diff.years} anni, "
+			else: t1=""
+			if diff.months>0: t2 = f"{diff.months} mesi,"
+			else: t2=""
+			if diff.days>0: t3 = f"{diff.days} giorni fa"
+			else: t3="oggi"
+			tempo_trascorso = t1+t2+t3
 		else:
 			tempo_trascorso = "Mai realizzato"
 		print(f"{punteggio}, realizzato {conteggio} volte, l'ultima {tempo_trascorso}.")
@@ -349,6 +355,6 @@ KILLER_HAND_FREQUENZA = 25
 PERCENTUALE_MINIMA_PUNTATA = 0.03
 penalita_killer_hand = 10
 MAX_PENALITA_KH = 90
-VERSIONE="2.3.1 del 10 ottobre 2024"
+VERSIONE="2.3.2 del 22 ottobre 2024"
 if __name__ == "__main__":
 	poker_machine()
