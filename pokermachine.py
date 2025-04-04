@@ -24,7 +24,7 @@ SOGLIA_RIMESCOLAMENTO_TOTALE = 15
 KILLER_HAND_FREQUENZA = 25
 PERCENTUALE_MINIMA_PUNTATA = 0.03 # 3%
 MAX_PENALITA_KH = 90 # Penalità massima in % per perdita Killer Hand
-VERSIONE = "3.0.0 del 4 aprile 2025"
+VERSIONE = "3.0.3 del 4 aprile 2025"
 FILE_DATI = 'pokermachine_data.pkl'
 # Costanti per i valori delle carte (per chiarezza in valuta_mano)
 VALORE_JACK = 11
@@ -147,20 +147,41 @@ def formatta_tempo_trascorso(data_evento_str):
 		data_evento = datetime.strptime(data_evento_str, "%Y-%m-%d %H:%M:%S")
 		diff = relativedelta(ora, data_evento)
 		parts = []
-		if diff.years > 0: parts.append(f"{diff.years} ann{'i' if diff.years > 1 else 'o'}")
-		if diff.months > 0: parts.append(f"{diff.months} mes{'i' if diff.months > 1 else 'e'}")
-		# Mostra giorni solo se anni e mesi sono 0, o se specificamente richiesto
-		if diff.days > 0 and diff.years == 0 and diff.months == 0 : parts.append(f"{diff.days} giorn{'i' if diff.days > 1 else 'o'}")
+		# Aggiunge anni se presenti
+		if diff.years > 0:
+			parts.append(f"{diff.years} ann{'i' if diff.years > 1 else 'o'}")
+		# Aggiunge mesi se presenti
+		if diff.months > 0:
+			parts.append(f"{diff.months} mes{'i' if diff.months > 1 else 'e'}")
+		# Aggiunge giorni se presenti (indipendentemente da anni/mesi)
+		if diff.days > 0:
+			parts.append(f"{diff.days} giorn{'i' if diff.days > 1 else 'o'}")
+
+		# Gestisce il caso in cui l'evento sia avvenuto oggi o ieri
 		if not parts:
-			# Se meno di un giorno, potremmo mostrare ore/minuti o dire "oggi"
 			if ora.date() == data_evento.date():
-				return "Oggi"
-			else: # Appena passato mezzanotte
+				# Potrebbe essere più preciso e mostrare ore/minuti se la differenza è piccola
+				# Calcola la differenza in secondi
+				diff_secondi = (ora - data_evento).total_seconds()
+				if diff_secondi < 60:
+					return "Pochi istanti fa"
+				elif diff_secondi < 3600:
+					minuti = int(diff_secondi // 60)
+					return f"{minuti} minut{'i' if minuti > 1 else 'o'} fa"
+				else:
+					ore = int(diff_secondi // 3600)
+					return f"{ore} or{'e' if ore > 1 else 'a'} fa" # Più preciso di "Oggi"
+			elif (ora.date() - data_evento.date()).days == 1:
 				return "Ieri"
+			else: # Caso strano, data futura? O errore?
+				return "Data non gestita"
+		# Se ci sono parti (anni/mesi/giorni), costruisce la stringa
 		return ", ".join(parts) + " fa"
 	except ValueError:
-		return "Data non valida" # In caso di formato errato nel file .pkl
-
+		return "Data non valida"
+	except Exception as e: # Cattura altri possibili errori
+		print(f"Errore in formatta_tempo_trascorso: {e}")
+		return "Errore data"
 def mostra_report(dati):
 	print("\n== Report Statistiche ==")
 	print(f"Lanci dell'applicazione: {dati.get('launches', 'N/A')}")
@@ -179,6 +200,21 @@ def mostra_report(dati):
 		print(f"Perdita massima in una mano: {dati['perdita_massima']} ({formatta_tempo_trascorso(dati['data_perdita_massima'])})")
 	if dati['data_ultima_giocata']:
 		print(f"Ultima giocata: {formatta_tempo_trascorso(dati['data_ultima_giocata'])}")
+	mani_totali = dati['mani_giocate']
+	if mani_totali > 0:
+		# Elenca i nomi dei punteggi considerati "vincenti" (che pagano almeno la puntata)
+		punteggi_vincenti_keys = [
+			"Coppia pagata", "Doppia coppia", "Tris", "Scala",
+			"Colore", "Full", "Poker", "Super Poker",
+			"Scala a colore", "Scala Reale"
+		]
+		# Somma i conteggi per questi punteggi
+		mani_vincenti_conteggio = sum(dati['punteggi'].get(key, {}).get('conteggio', 0) for key in punteggi_vincenti_keys)
+		# Calcola la percentuale
+		percentuale_vincenti = (mani_vincenti_conteggio / mani_totali) * 100
+		print(f"Percentuale mani pagate (Coppia Pagata+): {percentuale_vincenti:.2f}% ({mani_vincenti_conteggio} su {mani_totali})")
+	else:
+		print("Percentuale mani pagate (Coppia Pagata+): N/A (nessuna mano giocata)")
 	print("\n== Tabella dei Punteggi Realizzati ==")
 	# Ordina per una qualche logica, es. per vincita decrescente o per nome
 	punteggi_ordinati = sorted(dati['punteggi'].items(), key=lambda item: calcola_vincita(item[0], 1), reverse=True)
@@ -317,14 +353,21 @@ def poker_machine():
 		puntata_valida = False
 		puntata = 0
 		while not puntata_valida:
-			raw_puntata = input(f"\nMano #{numero_mano_sessione} (Globale: {mani_totali_senza_fallimenti}) | Fiches: {fiches}. Puntata? (o INVIO per uscire): ")
+			record_mani = dati['record_mani_senza_fallimenti']
+			# Costruisce il nuovo prompt
+			prompt_puntata = f"\nMani: #{numero_mano_sessione}/{mani_totali_senza_fallimenti}/{record_mani} | F: {fiches}> "			
+			raw_puntata = input(prompt_puntata)
 			if raw_puntata == "": # Uscita volontaria
 				print("\nUscita dal gioco.")
 				# Calcola bilancio sessione
 				bilancio_sessione = fiches - saldo_iniziale_sessione
-				perc_sessione = (fiches * 100 / saldo_iniziale_sessione) if saldo_iniziale_sessione > 0 else 0
+				if saldo_iniziale_sessione > 0:
+					percentuale_variazione = (bilancio_sessione / saldo_iniziale_sessione) * 100
+				else:
+					# Gestisce il caso (improbabile) di inizio a 0 fiches
+					percentuale_variazione = 0
 				print(f"Hai iniziato la sessione con {saldo_iniziale_sessione} fiches.")
-				print(f"Concludi con {fiches} fiches (Bilancio: {bilancio_sessione:+}, {perc_sessione:.1f}%).")
+				print(f"Concludi con {fiches} fiches (Bilancio: {bilancio_sessione:+} | Variazione: {percentuale_variazione:+.1f}%).")
 				# Salva stato finale prima di uscire
 				dati['fiches_attuali'] = fiches
 				dati['data_ultima_giocata'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -371,15 +414,26 @@ def poker_machine():
 			salva_dati(dati)
 			return
 
+		# --- Ordina la mano per la visualizzazione e il prompt ---
+		# Ordina per seme (id) e poi per valore (Asso=14)
+		# Questa diventa la NUOVA 'mano' di riferimento per questa fase
+		mano_ordinata = sorted(mano, key=lambda c: (c.seme_id, c.valore if c.valore != 1 else VALORE_ASSO))
+
 		print("La tua mano:")
-		mano_str = []
-		for idx, carta in enumerate(mano):
-			mano_str.append(f"{idx+1}: {carta.nome} ({carta.desc_breve})")
-		print("\n".join(mano_str))
+		mano_str_display = [] # Stringhe per la visualizzazione numerata ORDINATA
+		for idx, carta in enumerate(mano_ordinata): # USA LA MANO ORDINATA
+			mano_str_display.append(f"{idx+1}: {carta.nome} ({carta.desc_breve})")
+		print("\n".join(mano_str_display))
+
+		# --- Genera stringa breve ordinata per il prompt (basata sulla stessa mano ordinata) ---
+		mano_breve_prompt = " ".join([c.desc_breve for c in mano_ordinata])
+		# --- Fine generazione stringa breve ---
 
 		# Chiedi quali carte tenere
 		while True:
-			mantenere_input = input("Quali carte vuoi tenere? (Es: 134 per tenere la 1a, 3a, 4a. INVIO per cambiarle tutte): ")
+			# Usa la stringa breve generata nel prompt
+			prompt_testo = f"{mano_breve_prompt} - Quali tieni? "
+			mantenere_input = input(prompt_testo)
 			indici_mantenere_validi = True
 			indici_mantenere = set()
 			if mantenere_input == "": # Cambia tutte
@@ -390,8 +444,10 @@ def poker_machine():
 			else:
 				for char_idx in mantenere_input:
 					idx = int(char_idx)
+					# La validazione usa ancora CARTE_PER_MANO che è 5
 					if 1 <= idx <= CARTE_PER_MANO:
-						indici_mantenere.add(idx - 1) # Aggiunge indice 0-based
+						# IMPORTANTE: Gli indici si riferiscono ora alla mano_ordinata
+						indici_mantenere.add(idx - 1) # Aggiunge indice 0-based relativo alla mano ordinata
 					else:
 						print(f"Numero carta non valido: {idx}. Inserisci numeri da 1 a {CARTE_PER_MANO}.")
 						indici_mantenere_validi = False
@@ -399,37 +455,40 @@ def poker_machine():
 			if indici_mantenere_validi:
 				break # Esce dal while
 
-		carte_da_mantenere = [mano[i] for i in indici_mantenere]
-		carte_da_sostituire = [mano[i] for i in range(CARTE_PER_MANO) if i not in indici_mantenere]
+		# --- Ricostruzione basata su mano_ordinata e indici selezionati ---
+		carte_da_mantenere = []
+		carte_da_sostituire = []
+		# Itera sulla mano ORDINATA per separare correttamente le carte
+		for i, carta in enumerate(mano_ordinata):
+			if i in indici_mantenere:
+				carte_da_mantenere.append(carta)
+			else:
+				carte_da_sostituire.append(carta)
+
 		num_da_sostituire = len(carte_da_sostituire)
 
 		if num_da_sostituire > 0:
-			print(f"Scarto {num_da_sostituire} carte e pesco le sostituzioni...")
-			# Usa scarta_carte della classe Mazzo
+			print(f"Scarto {num_da_sostituire} carte.")
 			mazzo.scarta_carte(carte_da_sostituire)
-			# Pesca le nuove carte (il rimescolamento scarti è automatico se serve)
 			nuove_carte = mazzo.pesca(num_da_sostituire)
-			# Altro controllo di sicurezza (ancora più improbabile qui)
 			if len(nuove_carte) < num_da_sostituire:
 				print("ERRORE CRITICO: Non è stato possibile pescare le carte sostitutive!")
-				dati['fiches_attuali'] = fiches + puntata # Restituisce puntata
+				dati['fiches_attuali'] = fiches + puntata
 				salva_dati(dati)
 				return
+			# La nuova mano è formata dalle carte mantenute (dall'ordine visualizzato) + le nuove
 			mano = carte_da_mantenere + nuove_carte
 		else:
 			print("Tieni tutte le carte.")
-
-		# --- Valutazione Mano Finale ---
+			# La mano rimane quella ordinata inizialmente
+			mano = mano_ordinata		# --- Valutazione Mano Finale ---
 		print("\nMano finale:")
 		mano_finale_str = [f"- {carta.nome} ({carta.desc_breve})" for carta in mano]
 		print("\n".join(mano_finale_str))
-
 		punteggio = valuta_mano(mano)
 		importo_restituito = calcola_vincita(punteggio, puntata)
 		vincita_netta = importo_restituito - puntata
-
 		print(f"\nRisultato: {punteggio}!")
-
 		# Gestione Vincita/Perdita Normale e Killer Hand
 		if vincita_netta >= 0: # Hai vinto o pareggiato (Coppia Pagata)
 			fiches_vinte = vincita_netta
@@ -492,13 +551,6 @@ def poker_machine():
 			salva_dati(dati)
 			mostra_report(dati)
 			return # Esce dalla funzione
-
-		# Pausa prima della prossima mano o salva i dati qui per evitare perdite in caso di crash
-		# input("\nPremi INVIO per la prossima mano...") # Opzionale
 		salva_dati(dati) # Salva dopo ogni mano completata
-
-	# Questa parte è raggiunta solo se fiches > 0 e l'utente preme INVIO per uscire
-	# Il salvataggio è già gestito nel blocco di uscita volontaria
-
 if __name__ == "__main__":
 	poker_machine()
