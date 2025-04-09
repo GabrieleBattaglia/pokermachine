@@ -5,16 +5,7 @@ import sys
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from collections import Counter
-# Assicurati che il file mazzo_classe.py sia accessibile
-try:
-	# Modificato per importare direttamente la classe Mazzo
-	# Assumendo che mazzo_classe.py sia nella stessa directory o in PYTHONPATH
-	from GBUtils import Mazzo
-except ImportError:
-	print("Errore: Impossibile importare la classe Mazzo.")
-	print("Assicurati che il file 'mazzo_classe.py' sia presente.")
-	sys.exit(1) # Esce se la classe Mazzo non è trovata
-
+from GBUtils	import Mazzo
 # --- Costanti Globali ---
 NUM_MAZZI = 10 # Numero di mazzi standard da 52 carte usati
 CARTE_PER_MANO = 5
@@ -24,7 +15,7 @@ SOGLIA_RIMESCOLAMENTO_TOTALE = 15
 KILLER_HAND_FREQUENZA = 25
 PERCENTUALE_MINIMA_PUNTATA = 0.03 # 3%
 MAX_PENALITA_KH = 90 # Penalità massima in % per perdita Killer Hand
-VERSIONE = "3.0.3 del 4 aprile 2025"
+VERSIONE = "3.1.0 del 9 aprile 2025"
 FILE_DATI = 'pokermachine_data.pkl'
 # Costanti per i valori delle carte (per chiarezza in valuta_mano)
 VALORE_JACK = 11
@@ -329,7 +320,6 @@ def poker_machine():
 	saldo_iniziale_sessione = fiches
 	while fiches > 0:
 		# --- Controllo Rimescolamento Totale ---
-		# Controlla se le carte totali (mazzo + scarti) sono sotto la soglia
 		carte_totali_disponibili = len(mazzo.carte) + len(mazzo.scarti)
 		if carte_totali_disponibili < SOGLIA_RIMESCOLAMENTO_TOTALE:
 			print("\n--- Attenzione: Carte quasi esaurite! ---")
@@ -337,12 +327,10 @@ def poker_machine():
 			mazzo = Mazzo(tipo_francese=True, num_mazzi=NUM_MAZZI)
 			mazzo.mescola_mazzo()
 			print("Rimescolamento completato. Si continua a giocare!")
-		# Determina se è una Killer Hand (basata sulle mani totali dall'ultimo fallimento)
+		# Determina se è una Killer Hand
 		mani_totali_senza_fallimenti = dati['mani_dall_ultimo_fallimento'] + 1
 		is_mano_speciale = (mani_totali_senza_fallimenti % KILLER_HAND_FREQUENZA == 0)
 		if is_mano_speciale:
-			# Incrementa il contatore SOLO se è una KH effettiva
-			# Questo conteggio determina la penalità
 			killer_hand_count += 1
 			penalita_attuale = min(killer_hand_count * 10, MAX_PENALITA_KH)
 			print(f"\n*** KILLER HAND #{killer_hand_count} (Mano {mani_totali_senza_fallimenti}) ***")
@@ -354,39 +342,52 @@ def poker_machine():
 		puntata = 0
 		while not puntata_valida:
 			record_mani = dati['record_mani_senza_fallimenti']
-			# Costruisce il nuovo prompt
-			prompt_puntata = f"\nMani: #{numero_mano_sessione}/{mani_totali_senza_fallimenti}/{record_mani} | F: {fiches}> "			
+			prompt_puntata = f"\nMani: #{numero_mano_sessione}/{mani_totali_senza_fallimenti}/{record_mani} | F: {fiches}> "
 			raw_puntata = input(prompt_puntata)
+			# --- NUOVA GESTIONE HELP '?' ---
+			if raw_puntata == '?':
+				puntata_min_calcolata = max(int(fiches * PERCENTUALE_MINIMA_PUNTATA), 1)
+				print("\n--- Aiuto Puntate ---")
+				print("Inserisci l'importo da puntare o usa gli shortcut:")
+				print(f"  m : Puntata minima ({PERCENTUALE_MINIMA_PUNTATA*100:.0f}%, attuale: {puntata_min_calcolata})")
+				print("  - : 10% delle fiches")
+				print("  , : 25% delle fiches")
+				print("  . : 50% delle fiches")
+				print("  ; : 75% delle fiches")
+				print("  + : 100% delle fiches (All-in)")
+				print("INVIO: Esci dal gioco")
+				print("--------------------")
+				continue # Richiedi nuovamente l'input
+			# --- FINE GESTIONE HELP ---
 			if raw_puntata == "": # Uscita volontaria
 				print("\nUscita dal gioco.")
-				# Calcola bilancio sessione
 				bilancio_sessione = fiches - saldo_iniziale_sessione
 				if saldo_iniziale_sessione > 0:
 					percentuale_variazione = (bilancio_sessione / saldo_iniziale_sessione) * 100
 				else:
-					# Gestisce il caso (improbabile) di inizio a 0 fiches
 					percentuale_variazione = 0
 				print(f"Hai iniziato la sessione con {saldo_iniziale_sessione} fiches.")
 				print(f"Concludi con {fiches} fiches (Bilancio: {bilancio_sessione:+} | Variazione: {percentuale_variazione:+.1f}%).")
-				# Salva stato finale prima di uscire
 				dati['fiches_attuali'] = fiches
 				dati['data_ultima_giocata'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-				# Salva il contatore KH persistente
 				dati['killer_hand_count'] = killer_hand_count
 				salva_dati(dati)
 				mostra_report(dati)
 				return # Termina la funzione poker_machine
-
 			# Gestione shortcut
 			shortcut_map = {'-': 0.10, ',': 0.25, '.': 0.50, ';': 0.75, '+': 1.0}
-			if raw_puntata in shortcut_map:
+			# --- NUOVO SHORTCUT 'm' ---
+			if raw_puntata == 'm':
+				puntata = max(int(fiches * PERCENTUALE_MINIMA_PUNTATA), 1)
+				# Non impostare puntata_valida = True qui, lascia che la validazione sotto controlli
+			# --- FINE SHORTCUT 'm' ---
+			elif raw_puntata in shortcut_map:
 				puntata = int(fiches * shortcut_map[raw_puntata])
 			elif raw_puntata.isdigit():
 				puntata = int(raw_puntata)
 			else:
-				print("Input non valido. Inserisci un numero, uno shortcut (-, ,, ., ;, +) o INVIO per uscire.")
+				print(f"Input non valido. Inserisci un numero, uno shortcut (m, -, ,, ., ;, +), '?' per aiuto o INVIO per uscire.")
 				continue # Richiedi input di nuovo
-
 			# Validazione puntata
 			puntata_minima = max(int(fiches * PERCENTUALE_MINIMA_PUNTATA), 1)
 			if puntata < 1:
@@ -399,39 +400,26 @@ def poker_machine():
 				puntata_valida = True
 			else:
 				puntata_valida = True
-
 		print(f"Puntata: {puntata}")
 		fiches -= puntata # Sottrai subito la puntata
-
 		# --- Distribuzione e Cambio Carte ---
 		print("Distribuisco le carte...")
 		mano = mazzo.pesca(CARTE_PER_MANO)
-		# Controllo di sicurezza post-pesca (non dovrebbe servire con rimescolamento totale)
 		if len(mano) < CARTE_PER_MANO:
 			print("ERRORE CRITICO: Non è stato possibile pescare 5 carte nonostante il controllo!")
-			# Potrebbe valere la pena salvare e uscire qui
 			dati['fiches_attuali'] = fiches + puntata # Restituisce la puntata
 			salva_dati(dati)
 			return
-
-		# --- Ordina la mano per la visualizzazione e il prompt ---
-		# Ordina per seme (id) e poi per valore (Asso=14)
-		# Questa diventa la NUOVA 'mano' di riferimento per questa fase
+		# Ordina la mano per la visualizzazione e il prompt
 		mano_ordinata = sorted(mano, key=lambda c: (c.seme_id, c.valore if c.valore != 1 else VALORE_ASSO))
-
 		print("La tua mano:")
-		mano_str_display = [] # Stringhe per la visualizzazione numerata ORDINATA
-		for idx, carta in enumerate(mano_ordinata): # USA LA MANO ORDINATA
+		mano_str_display = []
+		for idx, carta in enumerate(mano_ordinata):
 			mano_str_display.append(f"{idx+1}: {carta.nome} ({carta.desc_breve})")
 		print("\n".join(mano_str_display))
-
-		# --- Genera stringa breve ordinata per il prompt (basata sulla stessa mano ordinata) ---
 		mano_breve_prompt = " ".join([c.desc_breve for c in mano_ordinata])
-		# --- Fine generazione stringa breve ---
-
 		# Chiedi quali carte tenere
 		while True:
-			# Usa la stringa breve generata nel prompt
 			prompt_testo = f"{mano_breve_prompt} - Quali tieni? "
 			mantenere_input = input(prompt_testo)
 			indici_mantenere_validi = True
@@ -444,29 +432,23 @@ def poker_machine():
 			else:
 				for char_idx in mantenere_input:
 					idx = int(char_idx)
-					# La validazione usa ancora CARTE_PER_MANO che è 5
 					if 1 <= idx <= CARTE_PER_MANO:
-						# IMPORTANTE: Gli indici si riferiscono ora alla mano_ordinata
-						indici_mantenere.add(idx - 1) # Aggiunge indice 0-based relativo alla mano ordinata
+						indici_mantenere.add(idx - 1)
 					else:
 						print(f"Numero carta non valido: {idx}. Inserisci numeri da 1 a {CARTE_PER_MANO}.")
 						indici_mantenere_validi = False
-						break # Esce dal for interno
-			if indici_mantenere_validi:
-				break # Esce dal while
-
-		# --- Ricostruzione basata su mano_ordinata e indici selezionati ---
+						break
+				if indici_mantenere_validi:
+					break
+		# Ricostruzione basata su mano_ordinata e indici selezionati
 		carte_da_mantenere = []
 		carte_da_sostituire = []
-		# Itera sulla mano ORDINATA per separare correttamente le carte
 		for i, carta in enumerate(mano_ordinata):
 			if i in indici_mantenere:
 				carte_da_mantenere.append(carta)
 			else:
 				carte_da_sostituire.append(carta)
-
 		num_da_sostituire = len(carte_da_sostituire)
-
 		if num_da_sostituire > 0:
 			print(f"Scarto {num_da_sostituire} carte.")
 			mazzo.scarta_carte(carte_da_sostituire)
@@ -476,12 +458,11 @@ def poker_machine():
 				dati['fiches_attuali'] = fiches + puntata
 				salva_dati(dati)
 				return
-			# La nuova mano è formata dalle carte mantenute (dall'ordine visualizzato) + le nuove
 			mano = carte_da_mantenere + nuove_carte
 		else:
 			print("Tieni tutte le carte.")
-			# La mano rimane quella ordinata inizialmente
-			mano = mano_ordinata		# --- Valutazione Mano Finale ---
+			mano = mano_ordinata
+		# --- Valutazione Mano Finale ---
 		print("\nMano finale:")
 		mano_finale_str = [f"- {carta.nome} ({carta.desc_breve})" for carta in mano]
 		print("\n".join(mano_finale_str))
@@ -490,67 +471,57 @@ def poker_machine():
 		vincita_netta = importo_restituito - puntata
 		print(f"\nRisultato: {punteggio}!")
 		# Gestione Vincita/Perdita Normale e Killer Hand
-		if vincita_netta >= 0: # Hai vinto o pareggiato (Coppia Pagata)
+		if vincita_netta >= 0:
 			fiches_vinte = vincita_netta
 			print(f"Vinci {fiches_vinte} fiches (restituite {importo_restituito}).")
-			# Applica bonus Killer Hand se applicabile e se hai effettivamente vinto
-			if is_mano_speciale and fiches_vinte > 0: # Bonus solo su vincita netta > 0
-				bonus_kh = fiches_vinte * 2 # Triplica la vincita NETTA (vincita * 2 aggiuntive)
+			if is_mano_speciale and fiches_vinte > 0:
+				bonus_kh = fiches_vinte * 2
 				print(f"*** Bonus Killer Hand! Vinci {bonus_kh} fiches extra! ***")
 				fiches_vinte += bonus_kh
-			fiches += importo_restituito # Aggiunge l'importo totale restituito (incl. puntata originale)
-			dati['fiches_guadagnate'] += fiches_vinte # Registra solo la vincita netta + bonus
+			fiches += importo_restituito
+			dati['fiches_guadagnate'] += fiches_vinte
 			if fiches_vinte > dati['vincita_massima']:
 				dati['vincita_massima'] = fiches_vinte
 				dati['data_vincita_massima'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 				print("--> Nuovo Record Vincita Massima in una mano!")
-		else: # Hai perso la puntata
+		else:
 			print(f"Perdi la puntata di {puntata} fiches.")
-			# Applica penalità Killer Hand se applicabile
 			perdita_totale_mano = puntata
 			if is_mano_speciale:
-				penalita_kh_importo = int(fiches * (penalita_attuale / 100)) # Calcolata sulle fiches *prima* della perdita KH
-				penalita_kh_importo = min(penalita_kh_importo, fiches) # Non puoi perdere più di quello che hai
+				penalita_kh_importo = int(fiches * (penalita_attuale / 100))
+				penalita_kh_importo = min(penalita_kh_importo, fiches)
 				print(f"*** Penalità Killer Hand! Perdi un extra {penalita_attuale}% ({penalita_kh_importo} fiches)! ***")
 				fiches -= penalita_kh_importo
 				perdita_totale_mano += penalita_kh_importo
-			# Fiches già state ridotte della puntata all'inizio
-			dati['fiches_perdute'] += perdita_totale_mano # Registra perdita totale (puntata + penalità)
+			dati['fiches_perdute'] += perdita_totale_mano
 			if perdita_totale_mano > dati['perdita_massima']:
 				dati['perdita_massima'] = perdita_totale_mano
 				dati['data_perdita_massima'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 				print("--> Nuovo Record Perdita Massima in una mano!")
-
 		# --- Aggiornamento Statistiche ---
 		dati['fiches_attuali'] = fiches
 		dati['mani_giocate'] += 1
 		dati['mani_dall_ultimo_fallimento'] += 1
-		# Aggiorna record solo se non si è falliti
 		if fiches > 0 and dati['mani_dall_ultimo_fallimento'] > dati['record_mani_senza_fallimenti']:
 			dati['record_mani_senza_fallimenti'] = dati['mani_dall_ultimo_fallimento']
-		# Aggiorna statistiche punteggio
 		if punteggio != "Mano non valida":
 			dati['punteggi'][punteggio]['conteggio'] += 1
 			dati['punteggi'][punteggio]['ultima_realizzazione'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		# Incrementa contatore mani per la prossima iterazione
 		numero_mano_sessione += 1
-
 		# --- Controllo Game Over ---
 		if fiches <= 0:
 			print("\n**************** GAME OVER ****************")
 			print("Hai esaurito le fiches!")
-			# Il record viene aggiornato durante il gioco, ma stampiamo se è stato battuto in quest'ultima run
 			if dati['mani_dall_ultimo_fallimento'] == dati['record_mani_senza_fallimenti']:
 				print(f"Hai stabilito il tuo nuovo record di {dati['record_mani_senza_fallimenti']} mani senza fallimenti!")
-			# Registra il fallimento
 			dati['fallimenti'] += 1
 			dati['data_ultimo_fallimento'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-			dati['mani_dall_ultimo_fallimento'] = 0 # Azzera per il futuro
-			dati['killer_hand_count'] = 0 # Resetta contatore KH
+			dati['mani_dall_ultimo_fallimento'] = 0
+			dati['killer_hand_count'] = 0
 			dati['data_ultima_giocata'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 			salva_dati(dati)
 			mostra_report(dati)
-			return # Esce dalla funzione
+			return
 		salva_dati(dati) # Salva dopo ogni mano completata
 if __name__ == "__main__":
 	poker_machine()
