@@ -1,4 +1,4 @@
-# Data di concepimento 2 ottobre 2024
+# POKERMACHINE - Data di concepimento 2 ottobre 2024
 
 import pickle
 import sys
