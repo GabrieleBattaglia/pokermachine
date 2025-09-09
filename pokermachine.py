@@ -15,7 +15,7 @@ SOGLIA_RIMESCOLAMENTO_TOTALE = 15
 KILLER_HAND_FREQUENZA = 25
 PERCENTUALE_MINIMA_PUNTATA = 0.03 # 3%
 MAX_PENALITA_KH = 90 # Penalità massima in % per perdita Killer Hand
-VERSIONE = "3.1.0 del 9 aprile 2025"
+VERSIONE = "3.1.1 del 8 settembre 2025"
 FILE_DATI = 'pokermachine_data.pkl'
 # Costanti per i valori delle carte (per chiarezza in valuta_mano)
 VALORE_JACK = 11
@@ -319,14 +319,6 @@ def poker_machine():
 	killer_hand_count = dati['killer_hand_count'] # Contatore KH dall'ultimo fallimento
 	saldo_iniziale_sessione = fiches
 	while fiches > 0:
-		# --- Controllo Rimescolamento Totale ---
-		carte_totali_disponibili = len(mazzo.carte) + len(mazzo.scarti)
-		if carte_totali_disponibili < SOGLIA_RIMESCOLAMENTO_TOTALE:
-			print("\n--- Attenzione: Carte quasi esaurite! ---")
-			print(f"Ricostruisco e rimescolo le {52*NUM_MAZZI} carte totali...")
-			mazzo = Mazzo(tipo_francese=True, num_mazzi=NUM_MAZZI)
-			mazzo.mescola_mazzo()
-			print("Rimescolamento completato. Si continua a giocare!")
 		# Determina se è una Killer Hand
 		mani_totali_senza_fallimenti = dati['mani_dall_ultimo_fallimento'] + 1
 		is_mano_speciale = (mani_totali_senza_fallimenti % KILLER_HAND_FREQUENZA == 0)
@@ -415,7 +407,7 @@ def poker_machine():
 		print("La tua mano:")
 		mano_str_display = []
 		for idx, carta in enumerate(mano_ordinata):
-			mano_str_display.append(f"{idx+1}: {carta.nome} ({carta.desc_breve})")
+			mano_str_display.append(f"{idx+1}. {carta.nome}.")
 		print("\n".join(mano_str_display))
 		mano_breve_prompt = " ".join([c.desc_breve for c in mano_ordinata])
 		# Chiedi quali carte tenere
@@ -464,7 +456,7 @@ def poker_machine():
 			mano = mano_ordinata
 		# --- Valutazione Mano Finale ---
 		print("\nMano finale:")
-		mano_finale_str = [f"- {carta.nome} ({carta.desc_breve})" for carta in mano]
+		mano_finale_str = [f"--- {carta.nome}." for carta in mano]
 		print("\n".join(mano_finale_str))
 		punteggio = valuta_mano(mano)
 		importo_restituito = calcola_vincita(punteggio, puntata)
