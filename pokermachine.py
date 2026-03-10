@@ -1,7 +1,6 @@
 # POKERMACHINE - Data di concepimento 2 ottobre 2024
 
 import pickle
-import sys
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from collections import Counter
@@ -312,7 +311,7 @@ def poker_machine():
 	print("Mescolo il mazzo...")
 	mazzo.mescola_mazzo()
 	mostra_report(dati)
-	print(f"\n== Benvenuto alla Poker Machine! ==")
+	print("\n== Benvenuto alla Poker Machine! ==")
 	print(f"\tVersione {VERSIONE}")
 	print(f"\tLancio App #{dati['launches']}.")
 	numero_mano_sessione = 1 # Contatore mani in questa sessione
@@ -327,7 +326,7 @@ def poker_machine():
 			penalita_attuale = min(killer_hand_count * 10, MAX_PENALITA_KH)
 			print(f"\n*** KILLER HAND #{killer_hand_count} (Mano {mani_totali_senza_fallimenti}) ***")
 			print(f"Se perdi questa mano, perdi un extra {penalita_attuale}% delle tue fiches!")
-			print(f"Se vinci con un punteggio pagato, la vincita (netta) viene TRIPLICATA!")
+			print("Se vinci con un punteggio pagato, la vincita (netta) viene TRIPLICATA!")
 			print("****************************************")
 		# --- Input Puntata ---
 		puntata_valida = False
@@ -378,7 +377,7 @@ def poker_machine():
 			elif raw_puntata.isdigit():
 				puntata = int(raw_puntata)
 			else:
-				print(f"Input non valido. Inserisci un numero, uno shortcut (m, -, ,, ., ;, +), '?' per aiuto o INVIO per uscire.")
+				print("Input non valido. Inserisci un numero, uno shortcut (m, -, ,, ., ;, +), '?' per aiuto o INVIO per uscire.")
 				continue # Richiedi input di nuovo
 			# Validazione puntata
 			puntata_minima = max(int(fiches * PERCENTUALE_MINIMA_PUNTATA), 1)
