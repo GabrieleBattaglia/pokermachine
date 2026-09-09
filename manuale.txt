@@ -1,0 +1,138 @@
+Guida di PokerMachine
+Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Fable 5.1, UltraCode).
+Versione 4.0.0.
+
+1. Che cos'e'
+PokerMachine e' un video poker a fiches da riga di comando. Si punta, si
+ricevono cinque carte, si sceglie quali tenere, si cambiano le altre e la
+mano finale paga secondo la tabella dei punteggi. Non ci sono avversari:
+si gioca contro la tabella, e lo scopo e' durare il piu' possibile senza
+esaurire le fiches, battendo il proprio primato di mani. E' pensato per
+chi usa uno screen reader: tutto viene detto a parole, ogni evento ha un
+suono e il prompt di gioco sta in una riga corta per il display braille.
+
+2. Il mazzo
+Si gioca con dieci mazzi francesi da cinquantadue carte, senza jolly,
+cinquecentoventi carte in tutto. Per questo esistono punteggi che con un
+mazzo solo sarebbero impossibili, come il Super Poker, cinque carte dello
+stesso valore. Le carte di ogni mano tornano fra gli scarti, e quando il
+mazzo finisce gli scarti vengono rimescolati: il gioco lo dice, e si
+sente il fruscio del mazzo.
+
+3. Il prompt della puntata
+A ogni mano compare una riga corta, fatta per stare in trenta celle del
+display braille e lasciare spazio a cio' che si scrive:
+F 428 S 110 R 399 M 1>
+F sono le fiches, il gruzzolo attuale. S e' la serie, cioe' il numero
+della mano che sta per cominciare, contato dall'ultimo fallimento. R e'
+il record di mani senza fallimenti. M e' la mano di questa sessione.
+Le fiches da mille in su si leggono con un prefisso, K per le migliaia
+e M per i milioni, con al massimo due decimali: 3.52K sono 3520 fiches,
+195K sono centonovantacinquemila, 1.23M un milione e duecentotrentamila.
+La stessa forma compatta si usa in tutti i messaggi e nelle statistiche.
+I conteggi di mani e di punteggi restano esatti.
+Al prompt si puo' scrivere:
+un numero, cioe' le fiches da puntare, anche con il prefisso k per le
+migliaia o m per i milioni: 1k punta mille, 1.5k o 1,5k millecinquecento,
+2m due milioni;
+m da sola, la puntata minima, che e' il tre per cento delle fiches,
+almeno una;
+il trattino, il dieci per cento delle fiches;
+la virgola, il venticinque per cento;
+il punto, il cinquanta per cento;
+il punto e virgola, il settantacinque per cento;
+il piu', tutte le fiches;
+r, per rileggere le statistiche;
+il punto di domanda, per aprire questa guida;
+invio da solo, per uscire dal gioco salvando.
+Una puntata sotto il minimo viene alzata al minimo, e il gioco lo dice.
+Una puntata sopra le fiches disponibili viene rifiutata.
+
+4. Le carte
+Le cinque carte arrivano ordinate per seme e per valore, numerate da uno
+a cinque, ciascuna sulla sua riga. Poi il prompt le ripete in forma
+breve, la lettera del valore seguita da quella del seme, e chiede quali
+tenere, in una riga che sta nelle trenta celle del display braille:
+QC 9Q JQ 6F 8F tieni?
+I valori sono A per l'asso, le cifre da 2 a 9, 0 per il dieci, J per il
+jack, Q per la regina, K per il re. I semi sono C per i cuori, Q per i
+quadri, F per i fiori, P per le picche.
+Si scrivono i numeri delle carte da tenere, tutti attaccati e senza
+spazi: 145 tiene la prima, la quarta e la quinta. Invio da solo le
+cambia tutte. Le carte cambiate vengono sostituite e la mano finale
+viene letta e valutata.
+
+5. I punteggi e le vincite
+La vincita e' un multiplo della puntata, e il multiplo comprende la
+puntata stessa: con un tris la puntata torna indietro tre volte, cioe'
+la vincita netta e' due volte la puntata.
+Scala Reale: 250 volte la puntata. Dieci, jack, regina, re e asso dello
+stesso seme.
+Scala a colore: 55 volte. Cinque carte in sequenza dello stesso seme.
+Super Poker: 40 volte. Cinque carte dello stesso valore.
+Poker: 25 volte. Quattro carte dello stesso valore.
+Full: 9 volte. Un tris e una coppia.
+Colore: 6 volte. Cinque carte dello stesso seme.
+Scala: 4 volte. Cinque carte in sequenza. L'asso vale sia come carta
+piu' bassa, prima del due, sia come carta piu' alta, dopo il re.
+Tris: 3 volte. Tre carte dello stesso valore.
+Doppia coppia: 2 volte.
+Coppia pagata: 1 volta, cioe' pareggio, la puntata torna indietro. E' la
+coppia di jack, regine, re o assi.
+Coppia non pagata, dal dieci in giu', e Carta alta: la puntata e' persa.
+Ogni punteggio ha il suo suono, che cresce di lunghezza e di ricchezza
+con il valore della mano: due note gravi per la carta alta, una scala
+musicale per la scala, la stessa nota su tre ottave per il colore, e
+una fanfara di tre secondi per la scala reale.
+
+6. La Killer Hand
+Ogni venticinque mani senza fallimenti, cioe' alla mano 25, 50, 75 e
+cosi' via della serie, arriva una Killer Hand. Viene annunciata prima
+della puntata, con il suo suono. Se la mano vince con un punteggio
+pagato, la vincita netta viene triplicata. Se pareggia non succede
+niente. Se perde, oltre alla puntata si paga una penalita': una
+percentuale delle fiches con cui si e' entrati nella mano, puntata
+compresa. La percentuale e' il dieci per cento alla prima Killer Hand
+della serie, il venti alla seconda, e cresce di dieci a ogni Killer
+Hand fino al novanta per cento. La penalita' non toglie mai piu' di
+quello che resta dopo la puntata, ma puo' azzerare le fiches e chiudere
+la partita. Il conto delle Killer Hand riparte da zero a ogni fallimento.
+Chi esce dal gioco sul prompt di una Killer Hand la ritrova, con la
+stessa penalita', al prossimo avvio.
+
+7. Record, traguardi e soglie
+Il gioco annuncia, con un suono ciascuno:
+il nuovo record di vincita in una mano e quello di perdita, che nelle
+Killer Hand comprendono bonus e penalita';
+il primato di mani senza fallimenti, nel momento in cui viene superato;
+il traguardo di ogni cento mani senza fallimenti;
+la prima volta, dall'ultimo fallimento, in cui le fiches superano le
+soglie di mille, diecimila, centomila e un milione.
+
+8. Il game over
+Quando le fiches finiscono la partita si chiude. Il gioco dice quante
+mani e' durata la serie e qual e' il primato, conta il fallimento, e al
+prossimo avvio si riparte con duecento fiches.
+
+9. Le statistiche
+All'avvio, con r al prompt e all'uscita, il gioco legge le statistiche
+di sempre: lanci del programma, mani giocate, mani dall'ultimo
+fallimento, record, fallimenti con la data dell'ultimo, fiches attuali,
+guadagnate e perdute con il bilancio, vincita e perdita massima in una
+mano con le date, ultima giocata, la percentuale di mani pagate, e per
+ogni punteggio quante volte e' uscito, la sua percentuale sulle mani
+giocate e quando e' uscito l'ultima volta. All'uscita si sente anche
+il bilancio della sessione appena giocata.
+
+10. Il salvataggio
+Tutto sta in pokermachine_data.json, accanto al programma, scritto dopo
+ogni mano. Accanto resta una copia di riserva con estensione .bak: se il
+file principale si rompe, il gioco riparte da quella e lo dice. Il
+salvataggio della versione 3, pokermachine_data.pkl, viene convertito al
+primo avvio e rinominato con l'estensione .migrato.
+
+11. Aggiornamenti
+Il programma compilato controlla all'avvio se su GitHub c'e' una versione
+nuova, mostra le novita' e chiede se installarla. Windows, al primo
+avvio di un eseguibile scaricato, puo' mostrare l'avviso di SmartScreen:
+e' normale, il programma non e' firmato.

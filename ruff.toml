@@ -1,0 +1,21 @@
+# Configurazione ruff di PokerMachine.
+# Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Fable 5.1, UltraCode).
+line-length = 140
+
+[lint]
+select = ["E", "F", "W", "B", "SIM", "UP", "I", "C4", "RET", "BLE", "S", "RUF", "DTZ"]
+ignore = [
+    # Righe lunghe: quasi tutti i messaggi all'utente stanno su una riga
+    # sola, e spezzarli renderebbe piu' difficile ritrovarli nel codice.
+    "E501",
+    # Date e orari sono di proposito ora locale, senza fuso: le date del
+    # salvataggio sono quelle dell'orologio di chi gioca, e passare a UTC
+    # sposterebbe di ore il momento di ogni record.
+    "DTZ005",
+    "DTZ007",
+]
+
+[lint.per-file-ignores]
+# Nelle prove l'assert e' lo strumento di pytest, non un controllo da
+# lasciare in produzione.
+"tests/*.py" = ["S101"]

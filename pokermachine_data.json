@@ -1,0 +1,70 @@
+{
+    "versione_formato": 1,
+    "launches": 99,
+    "mani_giocate": 2067,
+    "data_ultimo_fallimento": "2026-09-09 08:08:56",
+    "record_mani_senza_fallimenti": 399,
+    "mani_dall_ultimo_fallimento": 0,
+    "fiches_guadagnate": 619175,
+    "fiches_perdute": 590967,
+    "fiches_attuali": 200,
+    "fallimenti": 14,
+    "killer_hand_count": 0,
+    "soglia_fiches": 0,
+    "record_battuto": false,
+    "punteggi": {
+        "Scala Reale": {
+            "conteggio": 0,
+            "ultima_realizzazione": null
+        },
+        "Scala a colore": {
+            "conteggio": 0,
+            "ultima_realizzazione": null
+        },
+        "Super Poker": {
+            "conteggio": 3,
+            "ultima_realizzazione": "2025-04-06 20:16:34"
+        },
+        "Poker": {
+            "conteggio": 25,
+            "ultima_realizzazione": "2026-09-09 07:49:32"
+        },
+        "Full": {
+            "conteggio": 38,
+            "ultima_realizzazione": "2026-09-09 08:00:32"
+        },
+        "Colore": {
+            "conteggio": 34,
+            "ultima_realizzazione": "2026-09-09 07:56:16"
+        },
+        "Scala": {
+            "conteggio": 27,
+            "ultima_realizzazione": "2026-09-09 07:57:19"
+        },
+        "Tris": {
+            "conteggio": 202,
+            "ultima_realizzazione": "2026-09-09 08:07:43"
+        },
+        "Doppia coppia": {
+            "conteggio": 253,
+            "ultima_realizzazione": "2026-09-09 08:08:22"
+        },
+        "Coppia pagata": {
+            "conteggio": 489,
+            "ultima_realizzazione": "2026-09-09 08:08:33"
+        },
+        "Coppia non pagata": {
+            "conteggio": 421,
+            "ultima_realizzazione": "2026-09-09 08:08:56"
+        },
+        "Carta alta": {
+            "conteggio": 575,
+            "ultima_realizzazione": "2026-09-09 08:07:55"
+        }
+    },
+    "vincita_massima": 195000,
+    "data_vincita_massima": "2025-04-06 20:16:34",
+    "perdita_massima": 223958,
+    "data_perdita_massima": "2025-04-06 20:19:09",
+    "data_ultima_giocata": "2026-09-09 08:08:56"
+}

@@ -1,0 +1,31 @@
+# PokerMachine, pacchetti necessari per eseguirlo dal codice sorgente.
+# Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Fable 5.1, UltraCode).
+#
+# Si installa tutto con:
+#     pip install -r requirements.txt
+#
+# ATTENZIONE: manca una dipendenza che pip non puo' scaricare, perche' non sta
+# su PyPI. E' GBUtils, la libreria condivisa dal parco software di IZ4APU, che
+# va clonata a parte e resa raggiungibile da Python:
+#     git clone https://github.com/GabrieleBattaglia/GBUtils.git
+# poi si mette la sua cartella in PYTHONPATH, oppure si copia GBUtils.py
+# accanto a pokermachine.py. Accanto a GBUtils.py deve stare anche
+# Acu_Collection.json, che contiene tutti i suoni del gioco.
+#
+# I limiti minimi qui sotto sono prudenti. Lo sviluppo avviene su Windows con
+# Python 3.14.5.
+
+# Le date delle statistiche: quanto tempo e' passato, in anni, mesi e giorni.
+python-dateutil>=2.8
+
+# Il calcolo dei campioni audio dentro GBUtils.
+numpy>=1.26
+scipy>=1.11
+
+# Il motore audio: Acusticator di GBUtils riproduce da qui i suoni del gioco.
+sounddevice>=0.5
+
+# Il validatore, che va passato senza rilievi a ogni intervento sul codice,
+# e le prove automatiche della cartella tests.
+ruff>=0.6
+pytest>=8

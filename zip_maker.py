@@ -1,6 +1,7 @@
 # PokerMachine, utilita': prepara l'archivio per la distribuzione.
-# Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Opus 5, modalita' auto).
+# Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Fable 5.1, UltraCode).
 # 04/09/2026: primo chiamante, il mestiere sta in crea_archivio_release di GBUtils V104.
+# 09/09/2026: il salvataggio e' diventato JSON, con il vecchio pickle accanto.
 
 """Comprime il risultato di PyInstaller in un solo archivio.
 
@@ -11,15 +12,15 @@ PokerMachine si compila in un file unico, quindi dentro dist c'e'
 soltanto l'eseguibile e tutto il resto viaggia dentro di lui.
 
 Si lascia fuori il salvataggio, che nasce giocando accanto all'eseguibile
-e conterrebbe il gruzzolo di chi ha compilato. L'estensione pkl non e' fra
-quelle saltate d'ufficio, percio' va nominata qui.
+e conterrebbe il gruzzolo di chi ha compilato, insieme al pickle della
+versione 3 se ci fosse. Le copie di riserva restano fuori d'ufficio.
 """
 
 import sys
 
 from GBUtils import crea_archivio_release
 
-FUORI = ["pokermachine_data.pkl"]
+FUORI = ["pokermachine_data.json", "pokermachine_data.pkl", "pokermachine_data.pkl.migrato"]
 
 
 def main():
