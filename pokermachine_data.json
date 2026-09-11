@@ -1,16 +1,16 @@
 {
     "versione_formato": 1,
-    "launches": 102,
-    "mani_giocate": 2272,
-    "data_ultimo_fallimento": "2026-09-09 08:08:56",
+    "launches": 104,
+    "mani_giocate": 2368,
+    "data_ultimo_fallimento": "2026-09-11 11:42:37",
     "record_mani_senza_fallimenti": 399,
-    "mani_dall_ultimo_fallimento": 205,
-    "fiches_guadagnate": 623198,
-    "fiches_perdute": 592676,
-    "fiches_attuali": 2514,
-    "fallimenti": 14,
-    "killer_hand_count": 8,
-    "soglia_fiches": 1000,
+    "mani_dall_ultimo_fallimento": 0,
+    "fiches_guadagnate": 640752,
+    "fiches_perdute": 612744,
+    "fiches_attuali": 200,
+    "fallimenti": 15,
+    "killer_hand_count": 0,
+    "soglia_fiches": 0,
     "record_battuto": false,
     "punteggi": {
         "Scala Reale": {
@@ -26,45 +26,45 @@
             "ultima_realizzazione": "2025-04-06 20:16:34"
         },
         "Poker": {
-            "conteggio": 27,
-            "ultima_realizzazione": "2026-09-10 14:31:34"
+            "conteggio": 28,
+            "ultima_realizzazione": "2026-09-11 09:41:39"
         },
         "Full": {
             "conteggio": 44,
             "ultima_realizzazione": "2026-09-10 14:44:17"
         },
         "Colore": {
-            "conteggio": 36,
-            "ultima_realizzazione": "2026-09-10 14:45:19"
+            "conteggio": 42,
+            "ultima_realizzazione": "2026-09-11 11:39:16"
         },
         "Scala": {
-            "conteggio": 27,
-            "ultima_realizzazione": "2026-09-09 07:57:19"
+            "conteggio": 29,
+            "ultima_realizzazione": "2026-09-11 11:35:50"
         },
         "Tris": {
-            "conteggio": 216,
-            "ultima_realizzazione": "2026-09-10 14:41:45"
+            "conteggio": 228,
+            "ultima_realizzazione": "2026-09-11 11:41:35"
         },
         "Doppia coppia": {
-            "conteggio": 282,
-            "ultima_realizzazione": "2026-09-10 14:42:12"
+            "conteggio": 290,
+            "ultima_realizzazione": "2026-09-11 11:41:58"
         },
         "Coppia pagata": {
-            "conteggio": 541,
-            "ultima_realizzazione": "2026-09-10 14:43:56"
+            "conteggio": 564,
+            "ultima_realizzazione": "2026-09-11 11:41:44"
         },
         "Coppia non pagata": {
-            "conteggio": 472,
-            "ultima_realizzazione": "2026-09-10 14:45:02"
+            "conteggio": 493,
+            "ultima_realizzazione": "2026-09-11 11:42:37"
         },
         "Carta alta": {
-            "conteggio": 624,
-            "ultima_realizzazione": "2026-09-10 14:45:11"
+            "conteggio": 647,
+            "ultima_realizzazione": "2026-09-11 11:41:11"
         }
     },
     "vincita_massima": 195000,
     "data_vincita_massima": "2025-04-06 20:16:34",
     "perdita_massima": 223958,
     "data_perdita_massima": "2025-04-06 20:19:09",
-    "data_ultima_giocata": "2026-09-10 14:45:19"
+    "data_ultima_giocata": "2026-09-11 11:42:37"
 }
