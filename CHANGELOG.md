@@ -3,6 +3,10 @@
 Tutti i cambiamenti e le novità introdotte nelle versioni di PokerMachine.
 Il changelog nasce con la versione 4.0.0. Per le versioni precedenti il resoconto sta nella cronologia dei commit su GitHub.
 
+## [4.0.1] - 2026-09-12
+
+I percorsi dei file passano da GBUtils, che dalla V138 li offre a tutti con cartella_applicazione e percorso_risorsa: la logica che dice dove stanno i dati e le risorse era riscritta in dieci progetti, e adesso e' scritta in un posto solo. Il comportamento non cambia, tranne che una risorsa che nel pacchetto non c'e' viene ora cercata anche accanto all'eseguibile.
+
 ## [4.0.0] - 2026-09-09
 
 Revisione 1 del refactoring generale del parco software. La contabilità del gioco, che era rotta in tre punti, torna giusta; ogni evento ha un suono; il programma parla senza decorazioni.

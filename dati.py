@@ -16,10 +16,11 @@ OSError, e chi chiama decide come dirlo.
 import json
 import os
 import pickle
-import sys
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+from GBUtils import cartella_applicazione
+from GBUtils import percorso_risorsa as percorso_risorsa_condivisa
 
 import regole
 
@@ -55,10 +56,10 @@ def adesso():
 
 
 def cartella_programma():
-    """La cartella dell'eseguibile compilato, oppure quella del sorgente."""
-    if getattr(sys, "frozen", False):
-        return os.path.dirname(os.path.abspath(sys.executable))
-    return os.path.dirname(os.path.abspath(__file__))
+    """La cartella dell'eseguibile compilato, oppure quella del sorgente.
+    La logica sta in GBUtils, come tutte le utilita' condivise: qui resta il
+    nome con cui il programma la chiama."""
+    return cartella_applicazione()
 
 
 def percorso(nome=NOME_SALVATAGGIO, cartella=None):
@@ -70,10 +71,9 @@ def percorso_risorsa(nome):
 
     PyInstaller in file unico scompatta le risorse in una cartella
     temporanea, sys._MEIPASS, e non accanto all'eseguibile: da sorgente la
-    cartella e' quella del programma.
+    cartella e' quella del programma. La ricerca sta in GBUtils.
     """
-    base = getattr(sys, "_MEIPASS", None) or cartella_programma()
-    return os.path.join(base, nome)
+    return percorso_risorsa_condivisa(nome)
 
 
 def nuovi_dati():
