@@ -9,6 +9,8 @@ I percorsi dei file passano da GBUtils, che dalla V138 li offre a tutti con cart
 
 ## [4.0.0] - 2026-09-09
 
+Pubblicata su GitHub il 9 settembre 2026 come release `v4.0.0`, con il solo archivio `pokermachine.zip` in allegato.
+
 Revisione 1 del refactoring generale del parco software. La contabilità del gioco, che era rotta in tre punti, torna giusta; ogni evento ha un suono; il programma parla senza decorazioni.
 
 ### Aggiunto
