@@ -7,7 +7,8 @@
 Ogni trofeo si conquista una volta sola e resta nel salvataggio con la data,
 anche dopo il game over. controlla riceve i dati del giocatore e i fatti
 appena accaduti, e restituisce un evento per ogni trofeo nuovo, con il nome
-del suono della sua famiglia e la frase da dire. Il modulo non stampa e non
+del suo suono, trofeo_ seguito dalla chiave, e la frase da dire. Ogni trofeo
+ha il suo suono: dal 25/09/2026 nessun suono si condivide fra due eventi. Il modulo non stampa e non
 suona: come partita, restituisce eventi.
 
 I fatti sono un dizionario che chi chiama riempie con cio' che sa. Le chiavi
@@ -23,7 +24,7 @@ from dati import adesso
 from numeri import formatta_fiches
 
 Evento = namedtuple("Evento", ["nome", "testo"])
-Trofeo = namedtuple("Trofeo", ["chiave", "nome", "famiglia", "condizione"])
+Trofeo = namedtuple("Trofeo", ["chiave", "nome", "condizione"])
 
 SEMI = ("Cuori", "Quadri", "Fiori", "Picche")
 SOGLIE = (1_000, 10_000, 100_000, 1_000_000)
@@ -62,47 +63,41 @@ def _tutti_i_punteggi(dati, fatti):
 
 
 TROFEI = (
-    *(Trofeo(f"colore_{seme.lower()}", f"Colore di {seme.lower()}", "trofeo_mano", _colore(seme)) for seme in SEMI),
-    Trofeo("tris_gemello", "Tris gemello", "trofeo_mano", _punteggio("Tris gemello")),
-    Trofeo("poker_assi", "Poker d'assi", "trofeo_mano", _punteggio("Poker d'assi")),
-    Trofeo("tutti_i_punteggi", "Tutti i punteggi, tranne le cinque gemelle", "trofeo_mano", _tutti_i_punteggi),
-    Trofeo("killer_5", "Sopravvissuto alla Killer Hand numero 5", "trofeo_killer", _killer(5)),
-    Trofeo("killer_9", "Sopravvissuto alla Killer Hand numero 9", "trofeo_killer", _killer(9)),
-    Trofeo("tre_scudi", "Tre scudi insieme", "trofeo_killer", lambda dati, fatti: dati["scudi"] >= regole.SCUDI_MAX),
-    *(Trofeo(f"fiches_{s}", f"{formatta_fiches(s)} fiches", "trofeo_fiches", _soglia(s)) for s in SOGLIE),
+    *(Trofeo(f"colore_{seme.lower()}", f"Colore di {seme.lower()}", _colore(seme)) for seme in SEMI),
+    Trofeo("tris_gemello", "Tris gemello", _punteggio("Tris gemello")),
+    Trofeo("poker_assi", "Poker d'assi", _punteggio("Poker d'assi")),
+    Trofeo("tutti_i_punteggi", "Tutti i punteggi, tranne le cinque gemelle", _tutti_i_punteggi),
+    Trofeo("killer_5", "Sopravvissuto alla Killer Hand numero 5", _killer(5)),
+    Trofeo("killer_9", "Sopravvissuto alla Killer Hand numero 9", _killer(9)),
+    Trofeo("tre_scudi", "Tre scudi insieme", lambda dati, fatti: dati["scudi"] >= regole.SCUDI_MAX),
+    *(Trofeo(f"fiches_{s}", f"{formatta_fiches(s)} fiches", _soglia(s)) for s in SOGLIE),
     Trofeo(
         "rimonta",
         f"Rimonta, da meno di {RIMONTA_SOTTO} a più di {formatta_fiches(RIMONTA_SOPRA)} fiches nella stessa serie",
-        "trofeo_fiches",
         lambda dati, fatti: dati["serie"]["fiches_minime"] < RIMONTA_SOTTO and fatti.get("fiches", 0) > RIMONTA_SOPRA,
     ),
-    Trofeo(
-        "tutto_vinto", "Vinto puntando tutto", "trofeo_fiches", lambda dati, fatti: bool(fatti.get("tutto")) and bool(fatti.get("vinta"))
-    ),
-    Trofeo("montepremi", "Montepremi vinto", "trofeo_fiches", lambda dati, fatti: fatti.get("montepremi", 0) > 0),
-    Trofeo("serie_500", "500 mani in una serie", "trofeo_serie", _serie(500)),
-    Trofeo("serie_1000", "1000 mani in una serie", "trofeo_serie", _serie(1000)),
+    Trofeo("tutto_vinto", "Vinto puntando tutto", lambda dati, fatti: bool(fatti.get("tutto")) and bool(fatti.get("vinta"))),
+    Trofeo("montepremi", "Montepremi vinto", lambda dati, fatti: fatti.get("montepremi", 0) > 0),
+    Trofeo("serie_500", "500 mani in una serie", _serie(500)),
+    Trofeo("serie_1000", "1000 mani in una serie", _serie(1000)),
     Trofeo(
         "dieci_pagate",
         f"{PAGATE_DI_FILA} mani pagate di fila",
-        "trofeo_serie",
         lambda dati, fatti: dati["serie"]["pagate_di_fila"] >= PAGATE_DI_FILA,
     ),
     Trofeo(
         "cento_ottime",
         f"{OTTIME_DI_FILA} tenute ottime di fila",
-        "trofeo_abilita",
         lambda dati, fatti: dati["precisione"]["di_fila"] >= OTTIME_DI_FILA,
     ),
     Trofeo(
         "cinque_raddoppi",
         f"{RADDOPPI_DI_FILA} raddoppi riusciti di fila",
-        "trofeo_abilita",
         lambda dati, fatti: dati["raddoppi"]["di_fila"] >= RADDOPPI_DI_FILA,
     ),
 )
 CHIAVI = tuple(t.chiave for t in TROFEI)
-FAMIGLIE = tuple(dict.fromkeys(t.famiglia for t in TROFEI))
+SUONI = tuple(f"trofeo_{chiave}" for chiave in CHIAVI)
 
 
 def controlla(dati, fatti):
@@ -113,7 +108,7 @@ def controlla(dati, fatti):
             continue
         if trofeo.condizione(dati, fatti):
             dati["trofei"][trofeo.chiave] = adesso()
-            eventi.append(Evento(trofeo.famiglia, f"Trofeo conquistato: {trofeo.nome}."))
+            eventi.append(Evento(f"trofeo_{trofeo.chiave}", f"Trofeo conquistato: {trofeo.nome}."))
     return eventi
 
 

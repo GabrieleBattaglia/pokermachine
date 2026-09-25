@@ -174,7 +174,7 @@ def mostra_report(dati):
 
 def mostra_trofei(dati):
     """I trofei conquistati, con la data, e quelli ancora da conquistare."""
-    play_event("statistiche")
+    play_event("trofei")
     presi = trofei.conquistati(dati)
     print(f"Trofei conquistati: {len(presi)} su {len(trofei.TROFEI)}.")
     for trofeo, data in presi:

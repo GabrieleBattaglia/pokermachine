@@ -11,19 +11,21 @@ Per ogni evento scrive il nome, il preset e la sua descrizione, aspetta un
 tasto e suona. Spazio ripete il suono, invio passa al successivo, escape
 chiude. I suoni si sentono nell'ordine in cui capitano in una partita.
 Lanciato con l'argomento nuovi, fa sentire solo i suoni nati con la
-versione 5.
+versione 5; con rifatti, solo quelli rifatti dopo il collaudo.
 """
 
 import sys
 
 from GBUtils import Acusticator, key
 
+import trofei
 from suoni import EVENTI, play_event
 
 ORDINE = (
     "avvio",
     "mescola",
     "statistiche",
+    "trofei",
     "manuale",
     "sfide",
     "puntata",
@@ -37,6 +39,7 @@ ORDINE = (
     "tenuta_migliore",
     "Carta alta",
     "Coppia non pagata",
+    "coppia_muta",
     "Coppia gemella",
     "Coppia pagata",
     "Coppia gemella pagata",
@@ -72,11 +75,7 @@ ORDINE = (
     "montepremi_soglia",
     "montepremi_vinto",
     "sfida_vinta",
-    "trofeo_mano",
-    "trofeo_killer",
-    "trofeo_fiches",
-    "trofeo_serie",
-    "trofeo_abilita",
+    *trofei.SUONI,
     "record_vincita",
     "record_perdita",
     "record_mani",
@@ -86,6 +85,10 @@ ORDINE = (
     "chiusura",
 )
 NUOVI = (
+    "trofei",
+    "manuale",
+    "rimescolo",
+    "coppia_muta",
     "sfide",
     "consiglio",
     "tenuta_migliore",
@@ -112,16 +115,23 @@ NUOVI = (
     "montepremi_soglia",
     "montepremi_vinto",
     "sfida_vinta",
-    "trofeo_mano",
-    "trofeo_killer",
-    "trofeo_fiches",
-    "trofeo_serie",
-    "trofeo_abilita",
+    *trofei.SUONI,
 )
 
 
+# Quelli rifatti dopo il collaudo del 25 settembre 2026, perche' nessun suono
+# si ripeta fra due eventi.
+RIFATTI = ("trofei", "manuale", "rimescolo", "coppia_muta", *trofei.SUONI)
+
+
 def main():
-    elenco = [e for e in ORDINE if e in NUOVI] if "nuovi" in sys.argv[1:] else list(ORDINE)
+    argomenti = sys.argv[1:]
+    if "rifatti" in argomenti:
+        elenco = [e for e in ORDINE if e in RIFATTI]
+    elif "nuovi" in argomenti:
+        elenco = [e for e in ORDINE if e in NUOVI]
+    else:
+        elenco = list(ORDINE)
     print(f"{len(elenco)} suoni. Invio suona e passa oltre, spazio ripete, escape chiude.")
     for numero, evento in enumerate(elenco, 1):
         preset = EVENTI[evento]

@@ -39,7 +39,7 @@ MOLTIPLICATORE_COLORE = 2
 MOLTIPLICATORE_SEME = 4
 RADDOPPI_MAX = 5
 # Il suono di una mano che di solito paga, ma che una sorpresa ha reso muta.
-MUTA = "Coppia non pagata"
+MUTA = "coppia_muta"
 
 
 def prossima_mano(dati):

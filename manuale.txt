@@ -100,7 +100,7 @@ Il gioco dice quanto vale all'inizio di ogni sessione e a ogni Killer Hand, e le
 All'inizio di ogni serie il gioco estrae tre sfide e le annuncia: per esempio fare un Full, vincere una Killer Hand o fare cinque mani pagate di fila. Ciascuna sfida superata regala uno scudo, e il gioco lo dice con il suo suono. Le sfide in corso si rileggono nelle statistiche.
 
 12. I trofei
-I trofei si conquistano una volta sola e restano per sempre, anche dopo il game over. Ognuno ha il suo annuncio, e ogni famiglia di trofei il suo suono. La lettera t, al prompt della puntata, li elenca: prima quelli conquistati, con la data, poi quelli ancora da conquistare.
+I trofei si conquistano una volta sola e restano per sempre, anche dopo il game over. Ognuno ha il suo annuncio e il suo suono. La lettera t, al prompt della puntata, li elenca: prima quelli conquistati, con la data, poi quelli ancora da conquistare.
 Ci sono i trofei delle mani, come un Colore per ciascun seme, un Tris gemello, un Poker d'assi e tutti i punteggi almeno una volta, tranne le cinque gemelle, che escono una volta ogni milione di mani; quelli della Killer Hand, come sopravvivere alla quinta e alla nona o tenere tre scudi insieme; quelli delle fiches, come le soglie da mille a un milione, la rimonta da meno di cinquanta a più di mille, la vincita puntando tutto e il montepremi; quelli della serie, come cinquecento e mille mani o dieci mani pagate di fila; e quelli dell'abilità, cento tenute ottime di fila e cinque raddoppi riusciti di fila.
 
 13. Record, traguardi e soglie

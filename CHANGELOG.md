@@ -20,14 +20,15 @@ La versione 5 ripensa l'equilibrio del gioco. Con dieci mazzi la tabella della 4
 - **La mano servita annunciata**, per esempio Servita: Coppia pagata, di jack, e le carte appena arrivate segnate con la parola nuova nella mano finale.
 - **Statistiche nuove**: il ritorno personale, cioè le fiches tornate ogni cento puntate, il bilancio delle Killer Hand e le ultime dieci serie.
 - **Le sfide.** All'inizio di ogni serie il gioco estrae tre sfide; ciascuna superata regala uno scudo.
-- **I trofei.** Ventidue traguardi da conquistare una volta sola, ciascuno con il suo annuncio e un suono per famiglia; la lettera t al prompt della puntata li elenca.
-- Trenta suoni nuovi della famiglia pokermachine nella collezione condivisa Acu_Collection.json, e ascolta_suoni.py che con l'argomento nuovi fa sentire solo quelli.
+- **I trofei.** Ventidue traguardi da conquistare una volta sola, ciascuno con il suo annuncio e il suo suono; la lettera t al prompt della puntata li elenca.
+- Cinquantadue suoni nuovi della famiglia pokermachine nella collezione condivisa Acu_Collection.json, e ascolta_suoni.py che con l'argomento nuovi fa sentire solo quelli. Ogni evento ha il suo suono e nessuno si ripete: una prova automatica controlla che due eventi non condividano un preset, né per nome né per contenuto.
 - La cartella taratura, con gli strumenti che hanno tarato tabella e Killer Hand con la strategia ottima: servono a rifare i conti prima di ogni ritocco.
 
 ### Modificato
 - **La tabella dei punteggi.** Tarata con il motore della strategia ottima e con migliaia di serie simulate, rende il 128,6 per cento, e il montepremi aggiunge circa un punto. Restano come prima Coppia pagata 1, Doppia coppia 2, Super Poker 40, Scala a colore 55 e Scala Reale 250. Cambiano il Tris, da 3 a 2, il Full da 9 a 4, il Colore da 6 a 4 e il Poker, che si divide: 25 quello d'assi, 10 dal 2 al 4, 6 dal 5 al re. La Scala sale da 4 a 6, perché con dieci mazzi è più rara di full e colore. Le gemelle: Coppia gemella 1, Coppia gemella pagata 2, Tris gemello 6, Poker gemello 50, Cinque gemelle 2500; il Full a colore 55.
 - **Le statistiche** hanno gli scudi, il montepremi, la precisione delle tenute, i raddoppi, i trofei e le sfide in corso. Le mani pagate si contano con un contatore loro, perché con la sorpresa delle coppie mute una coppia può pagare zero.
 - Il salvataggio passa al formato 2. Un salvataggio della versione 4 si legge senza perdere niente: i conteggi dei punteggi restano nelle categorie dove sono stati fatti, e le novità partono da zero.
+- **La guida e l'elenco dei trofei** non suonano più come le statistiche, e il rimescolamento degli scarti non suona più come il mazzo mescolato all'inizio.
 - **Le carte in ordine di valore**, dal due all'asso, invece che per seme: coppie, tris e gemelle stanno vicine.
 - **Il prompt della puntata** tiene le lettere attaccate ai numeri, F428 S110 R399 M1, e così resta nelle trenta celle anche con milioni di fiches e serie lunghe.
 - **Invio al prompt delle carte** accetta la tenuta proposta; per cambiare tutte le carte si scrive zero.

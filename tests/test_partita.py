@@ -269,10 +269,10 @@ def test_trofei_della_mano_e_della_puntata():
     eventi = partita.esito_mano(dati, 500, "Colore", carte=colore)
     assert "colore_cuori" in dati["trofei"]
     assert "tutto_vinto" in dati["trofei"]
-    assert "trofeo_mano" in nomi(eventi)
-    assert "trofeo_fiches" in nomi(eventi)
+    assert "trofeo_colore_cuori" in nomi(eventi)
+    assert "trofeo_tutto_vinto" in nomi(eventi)
     assert "colore_cuori" not in [t.chiave for t in trofei.da_conquistare(dati)]
-    assert nomi(partita.esito_mano(dati, 10, "Colore", carte=colore)).count("trofeo_mano") == 0
+    assert not any(n.startswith("trofeo_colore") for n in nomi(partita.esito_mano(dati, 10, "Colore", carte=colore)))
 
 
 def test_trofeo_della_killer_hand_solo_se_si_sopravvive():

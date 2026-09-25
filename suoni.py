@@ -8,6 +8,10 @@
 # 24/09/2026: versione 5. I suoni delle categorie nuove, delle regole a
 # sorpresa, degli scudi, del consiglio, del raddoppio, del montepremi, dei
 # trofei e delle sfide. La penalita' della Killer Hand non c'e' piu'.
+# 25/09/2026: dal collaudo, mai lo stesso suono per due eventi diversi. La
+# guida non suona piu' come le statistiche, il rimescolamento non suona come
+# il mescolare iniziale, la coppia resa muta ha il suo suono e ogni trofeo il
+# suo, invece dei cinque di famiglia.
 
 """Collega gli eventi di PokerMachine ai suoni della collezione condivisa.
 
@@ -21,19 +25,22 @@ e' un errore.
 
 from GBUtils import Acusticator
 
+import trofei
+
 EVENTI = {
     "avvio": "pokermachine_avvio",
     "chiusura": "pokermachine_chiusura",
     "mescola": "mazzo_mescolato",
-    "rimescolo": "mazzo_mescolato",
+    "rimescolo": "pokermachine_rimescolo",
     "puntata": "pokermachine_puntata",
     "puntata_minima": "pokermachine_puntata_minima",
     "distribuzione": "pokermachine_distribuzione",
     "scarto": "pokermachine_scarto",
     "tieni_tutte": "doppio_tic_conferma",
     "errore": "errore_secco",
-    "manuale": "apertura",
+    "manuale": "pokermachine_manuale",
     "statistiche": "apertura",
+    "trofei": "pokermachine_trofei",
     "consiglio": "pokermachine_consiglio",
     "tenuta_migliore": "pokermachine_tenuta_migliore",
     "killer_hand": "pokermachine_killer_hand",
@@ -59,14 +66,10 @@ EVENTI = {
     "soglia_fiches": "pokermachine_soglia_fiches",
     "sfide": "pokermachine_sfide",
     "sfida_vinta": "pokermachine_sfida_vinta",
-    "trofeo_mano": "pokermachine_trofeo_mano",
-    "trofeo_killer": "pokermachine_trofeo_killer",
-    "trofeo_fiches": "pokermachine_trofeo_fiches",
-    "trofeo_serie": "pokermachine_trofeo_serie",
-    "trofeo_abilita": "pokermachine_trofeo_abilita",
     "game_over": "pokermachine_game_over",
     "Carta alta": "pokermachine_carta_alta",
     "Coppia non pagata": "pokermachine_coppia_non_pagata",
+    "coppia_muta": "pokermachine_coppia_muta",
     "Coppia gemella": "pokermachine_coppia_gemella",
     "Coppia pagata": "pokermachine_coppia_pagata",
     "Coppia gemella pagata": "pokermachine_coppia_gemella_pagata",
@@ -86,6 +89,8 @@ EVENTI = {
     "Scala Reale": "pokermachine_scala_reale",
     "Cinque gemelle": "pokermachine_cinque_gemelle",
 }
+# Ogni trofeo ha il suo suono, con il nome della sua chiave.
+EVENTI.update({f"trofeo_{chiave}": f"pokermachine_trofeo_{chiave}" for chiave in trofei.CHIAVI})
 
 
 def play_event(nome_evento, sync=True):

@@ -1,8 +1,8 @@
 Collaudo di PokerMachine 5.0.0
 Scrivi il commento dopo i due punti della riga che non va, cancella le righe che vanno bene. Quando il file è vuoto la prova è finita.
-Prova 1, i suoni nuovi.
-Prima: dalla cartella del gioco lancia python ascolta_suoni.py nuovi.
+Prova 1, i suoni rifatti.
+Prima: dalla cartella del gioco lancia python ascolta_suoni.py rifatti.
 Passo 1: ascoltali tutti, riascoltando con lo spazio quando serve.
-Esito: 3 e 4 sono identici. Differenzia, la banca db ne ha tantissimi e non è un problema trovarne di diversi. Più in generale, non usare mai lo stesso suono per due eventi diversi.
-Il resto. Ottimo!
-
+Domanda 1: ci sono due suoni uguali, o così simili da confonderli?
+Domanda 2: quali non ti piacciono?
+Esito:
