@@ -3,32 +3,6 @@ Scrivi il commento dopo i due punti della riga che non va, cancella le righe che
 Prova 1, i suoni nuovi.
 Prima: dalla cartella del gioco lancia python ascolta_suoni.py nuovi.
 Passo 1: ascoltali tutti, riascoltando con lo spazio quando serve.
-Domanda 1: quali suoni non ti piacciono?
-Domanda 2: quali suoni si confondono fra loro, o con quelli vecchi?
-Domanda 3: quali suoni sono troppo lunghi o troppo invadenti per quanto spesso capitano?
-Esito:
-Prova 2, una sessione con il tuo salvataggio.
-Prima: lancia python pokermachine.py, con il salvataggio di sempre accanto al programma.
-Passo 1: ascolta tutto fino al primo prompt della puntata.
-Passo 2: gioca almeno venticinque mani, fino a una Killer Hand, puntando come preferisci.
-Passo 3: in qualche mano, al prompt delle carte, premi c prima di scegliere; in qualcuna accetta la proposta con invio, in qualcuna scrivi 0.
-Passo 4: al prompt della puntata premi r, poi t.
-Domanda 1: le statistiche della versione vecchia sono tutte al loro posto?
-Domanda 2: i prompt stanno sul display braille e si leggono bene?
-Domanda 3: l'annuncio della Killer Hand dice tutto quello che ti serve per decidere la puntata?
-Domanda 4: il consiglio e il commento a fine mano sono chiari e utili?
-Domanda 5: c'è qualche frase lunga, ripetuta o fastidiosa da ascoltare a ogni mano?
-Domanda 6: la tenuta proposta dopo tieni, accettata con invio, ti aiuta o ti toglie il gusto della scelta?
-Domanda 7: le carte in ordine di valore, l'annuncio della servita e la parola nuova nella mano finale si leggono bene?
-Esito:
-Prova 3, il raddoppio.
-Prima: nella stessa sessione, aspetta una mano vinta.
-Passo 1: prova il raddoppio con il colore, poi con il seme, poi incassa con invio.
-Domanda 1: il prompt del raddoppio è chiaro?
-Domanda 2: la spiegazione detta la prima volta basta, o serve il punto di domanda?
-Esito:
-Prova 4, la guida.
-Prima: al prompt della puntata premi il punto di domanda.
-Passo 1: leggi la guida, almeno i capitoli dal 5 al 12.
-Domanda 1: c'è qualcosa di poco chiaro o di sbagliato rispetto a quello che hai visto giocando?
-Esito:
+Esito: 3 e 4 sono identici. Differenzia, la banca db ne ha tantissimi e non è un problema trovarne di diversi. Più in generale, non usare mai lo stesso suono per due eventi diversi.
+Il resto. Ottimo!
+
