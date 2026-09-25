@@ -2,5 +2,5 @@
 # Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Opus 5.5, UltraCode).
 
 VERSION = "5.0.0"
-DATE = "24 settembre 2026"
+DATE = "25 settembre 2026"
 AUTHOR = "Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Opus 5.5, UltraCode)"
