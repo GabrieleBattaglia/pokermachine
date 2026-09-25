@@ -134,3 +134,28 @@ def test_tempo_trascorso():
     assert dati.formatta_tempo_trascorso(dati.adesso()) == "pochi istanti fa"
     assert dati.formatta_tempo_trascorso("2099-01-01 00:00:00") == "in una data futura"
     assert dati.formatta_tempo_trascorso("2020-01-01 00:00:00").endswith(" fa")
+
+
+def test_le_mani_pagate_di_un_salvataggio_vecchio_si_contano_dai_punteggi():
+    vecchio = {"punteggi": {"Tris": {"conteggio": 7}, "Coppia pagata": {"conteggio": 5}, "Carta alta": {"conteggio": 9}}}
+    assert dati.completa(vecchio)["mani_pagate"] == 12
+    assert dati.completa({**vecchio, "mani_pagate": 3})["mani_pagate"] == 3
+
+
+def test_senza_il_file_principale_si_riparte_dalla_copia_piu_recente(tmp_path):
+    cartella = str(tmp_path)
+    vecchio = dati.nuovi_dati()
+    vecchio["mani_giocate"] = 100
+    dati.salva_dati(vecchio, cartella)
+    nuovo = dati.nuovi_dati()
+    nuovo["mani_giocate"] = 101
+    dati.salva_dati(nuovo, cartella)
+    principale = dati.percorso(cartella=cartella)
+    os.replace(principale, principale + ".tmp")
+    letto, avvisi = dati.carica_dati(cartella)
+    assert letto["mani_giocate"] == 101
+    assert any("copia temporanea" in a for a in avvisi)
+    os.remove(principale + ".tmp")
+    letto, avvisi = dati.carica_dati(cartella)
+    assert letto["mani_giocate"] == 100
+    assert any("copia di riserva" in a for a in avvisi)

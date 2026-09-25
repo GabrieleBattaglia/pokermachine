@@ -3,6 +3,33 @@
 Tutti i cambiamenti e le novità introdotte nelle versioni di PokerMachine.
 Il changelog nasce con la versione 4.0.0. Per le versioni precedenti il resoconto sta nella cronologia dei commit su GitHub.
 
+## [5.0.0] - 2026-09-24
+
+La versione 5 ripensa l'equilibrio del gioco. Con dieci mazzi la tabella della 4.0.1 restituiva in media 1,66 fiches per ogni fiche puntata, e con la strategia migliore quasi 1,7: chi puntava con giudizio non perdeva mai, e l'intera partita la decideva la Killer Hand, che era una tassa più che una scelta. Adesso la tabella è più moderata e la Killer Hand è una gara, e per durare conta come si punta. Il piano sta nella issue 3, le tappe nelle issue dalla 4 alla 11.
+
+### Aggiunto
+- **Le categorie dei dieci mazzi.** Con dieci mazzi ogni carta esiste in dieci copie, e due carte possono essere identiche anche nel seme: sono le carte gemelle. Arrivano la Coppia gemella, la Coppia gemella pagata, il Tris gemello, il Poker gemello e le Cinque gemelle; il Poker si divide per valore: nascono il Poker d'assi e il Poker dal 2 al 4, e il Poker resta quello dal cinque al re; e c'è il Full a colore, tris e coppia tutti dello stesso seme. I punteggi passano da dodici a venti, ciascuno con il suo suono; quelli gemelli suonano allo specchio, una nota a sinistra e la sua gemella a destra.
+- **La mano paga la combinazione migliore che contiene.** Un Colore con dentro tre carte gemelle, o un Full il cui tris è gemello, paga ciò che vale di più, come in tutti i video poker.
+- **La Killer Hand come gara.** Ogni venticinque mani la Killer Hand chiede una puntata minima che raddoppia a ogni gara: 4 fiches alla prima, 8 alla seconda, 1024 alla nona. Chi ne ha meno punta tutto. Il gruzzolo di chi gioca al meglio cresce al massimo di 1,67 volte ogni venticinque mani, meno del doppio: nessuna serie scappa per sempre, ma nelle simulazioni chi punta con giudizio dura quasi il doppio di chi punta sempre il minimo, circa 500 mani contro 300 di mediana. La vincita netta si moltiplica ancora per tre.
+- **Le regole a sorpresa.** A ogni Killer Hand, prima della puntata, il gioco estrae e annuncia una regola: nessuna sorpresa; nessun cambio, con la mano servita che è quella finale; coppie mute, in cui le coppie non pagano; tutto o niente, con la vincita netta per cinque ma il pareggio che perde. Chi esce e rientra la ritrova uguale.
+- **Gli scudi.** Uno scudo restituisce la puntata di una Killer Hand persa. Se ne tengono al massimo tre; arrivano dalle mani rarissime e dalle sfide. Il prompt della puntata li mostra con la lettera D.
+- **Il consiglio.** Al prompt delle carte la lettera c dice la tenuta migliore, calcolata in modo esatto su tutte le carte che possono arrivare dal mazzo com'è in quel momento, con la tabella in vigore, la Killer Hand, la sorpresa, gli scudi e il montepremi. Dopo ogni mano, se la tenuta scelta non era la migliore, il gioco dice quante fiches in media rendeva di più, e le statistiche contano la precisione. Il motore del calcolo è stato verificato sul Jacks or Better a un mazzo, dove dà il ritorno teorico noto del 99,5439 per cento.
+- **Il raddoppio.** Dopo ogni vincita si può giocare quanto è appena tornato indietro: rosso o nero raddoppia la posta, il seme giusto la quadruplica, altrimenti la posta è persa. Le scommesse sono eque, fino a cinque di fila.
+- **Il montepremi.** L'uno per cento di ogni puntata va in un premio pagato dalla macchina, che resta salvato fra le sessioni e dopo il game over e si vince con le mani rarissime.
+- **Le sfide.** All'inizio di ogni serie il gioco estrae tre sfide; ciascuna superata regala uno scudo.
+- **I trofei.** Ventidue traguardi da conquistare una volta sola, ciascuno con il suo annuncio e un suono per famiglia; la lettera t al prompt della puntata li elenca.
+- Trenta suoni nuovi della famiglia pokermachine nella collezione condivisa Acu_Collection.json, e ascolta_suoni.py che con l'argomento nuovi fa sentire solo quelli.
+- La cartella taratura, con gli strumenti che hanno tarato tabella e Killer Hand con la strategia ottima: servono a rifare i conti prima di ogni ritocco.
+
+### Modificato
+- **La tabella dei punteggi.** Tarata con il motore della strategia ottima e con migliaia di serie simulate, rende il 128,6 per cento, e il montepremi aggiunge circa un punto. Restano come prima Coppia pagata 1, Doppia coppia 2, Super Poker 40, Scala a colore 55 e Scala Reale 250. Cambiano il Tris, da 3 a 2, il Full da 9 a 4, il Colore da 6 a 4 e il Poker, che si divide: 25 quello d'assi, 10 dal 2 al 4, 6 dal 5 al re. La Scala sale da 4 a 6, perché con dieci mazzi è più rara di full e colore. Le gemelle: Coppia gemella 1, Coppia gemella pagata 2, Tris gemello 6, Poker gemello 50, Cinque gemelle 2500; il Full a colore 55.
+- **Le statistiche** hanno gli scudi, il montepremi, la precisione delle tenute, i raddoppi, i trofei e le sfide in corso. Le mani pagate si contano con un contatore loro, perché con la sorpresa delle coppie mute una coppia può pagare zero.
+- Il salvataggio passa al formato 2. Un salvataggio della versione 4 si legge senza perdere niente: i conteggi dei punteggi restano nelle categorie dove sono stati fatti, e le novità partono da zero.
+- La guida è riscritta per la versione 5, un paragrafo per riga.
+
+### Tolto
+- **La penalità della Killer Hand.** Non serve più: la minaccia è il minimo della gara. Con lei sparisce la falla per cui puntare tutto in una Killer Hand annullava la penalità.
+
 ## [4.0.1] - 2026-09-12
 
 I percorsi dei file passano da GBUtils, che dalla V138 li offre a tutti con cartella_applicazione e percorso_risorsa: la logica che dice dove stanno i dati e le risorse era riscritta in dieci progetti, e adesso e' scritta in un posto solo. Il comportamento non cambia, tranne che una risorsa che nel pacchetto non c'e' viene ora cercata anche accanto all'eseguibile.

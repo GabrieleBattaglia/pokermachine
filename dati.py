@@ -1,9 +1,12 @@
 # PokerMachine, i dati: il salvataggio su disco e le date.
-# Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Fable 5.1, UltraCode).
+# Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Opus 5.5, UltraCode).
 # 09/09/2026: revisione 1 del refactoring generale. Il salvataggio passa da
 # pickle a JSON, vive accanto al programma e non nella cartella da cui lo si
 # lancia, si scrive su file temporaneo con copia di riserva, e al caricamento
 # ogni campo viene controllato. Il vecchio pickle si converte una volta sola.
+# 24/09/2026: versione 5, formato 2. Arrivano scudi, sorpresa della Killer
+# Hand in arrivo, montepremi, stato della serie con le sfide, precisione delle
+# tenute, raddoppi e trofei; un salvataggio della versione 4 li riceve vuoti.
 
 """Il salvataggio di PokerMachine.
 
@@ -27,7 +30,7 @@ import regole
 NOME_SALVATAGGIO = "pokermachine_data.json"
 NOME_SALVATAGGIO_VECCHIO = "pokermachine_data.pkl"
 FORMATO_DATA = "%Y-%m-%d %H:%M:%S"
-VERSIONE_FORMATO = 1
+VERSIONE_FORMATO = 2
 CHIAVI_INTERE = (
     "launches",
     "mani_giocate",
@@ -41,7 +44,16 @@ CHIAVI_INTERE = (
     "vincita_massima",
     "perdita_massima",
     "soglia_fiches",
+    "scudi",
+    "montepremi_centesimi",
+    "montepremi_vinti",
+    "mani_pagate",
 )
+# I gruppi di contatori della versione 5, ciascuno un dizionario di interi.
+GRUPPI = {
+    "precisione": ("tenute", "ottime", "di_fila"),
+    "raddoppi": ("tentati", "vinti", "di_fila", "fiches_vinte", "fiches_perse"),
+}
 CHIAVI_DATE = (
     "data_ultimo_fallimento",
     "data_vincita_massima",
@@ -76,6 +88,11 @@ def percorso_risorsa(nome):
     return percorso_risorsa_condivisa(nome)
 
 
+def dati_nuova_serie():
+    """Lo stato di una serie appena cominciata."""
+    return {"pagate_di_fila": 0, "ottime_di_fila": 0, "fiches_minime": regole.FICHES_INIZIALI, "sfide": []}
+
+
 def nuovi_dati():
     """La struttura di un giocatore appena arrivato."""
     return {
@@ -90,14 +107,23 @@ def nuovi_dati():
         "fiches_attuali": regole.FICHES_INIZIALI,
         "fallimenti": 0,
         "killer_hand_count": 0,
+        "sorpresa_kh": None,
         "soglia_fiches": 0,
         "record_battuto": False,
+        "scudi": 0,
+        "montepremi_centesimi": 0,
+        "montepremi_vinti": 0,
+        "mani_pagate": 0,
         "punteggi": {nome: {"conteggio": 0, "ultima_realizzazione": None} for nome in regole.NOMI_PUNTEGGI},
         "vincita_massima": 0,
         "data_vincita_massima": None,
         "perdita_massima": 0,
         "data_perdita_massima": None,
         "data_ultima_giocata": None,
+        "serie": dati_nuova_serie(),
+        "precisione": {"tenute": 0, "ottime": 0, "di_fila": 0, "valore_perso": 0.0},
+        "raddoppi": {"tentati": 0, "vinti": 0, "di_fila": 0, "fiches_vinte": 0, "fiches_perse": 0},
+        "trofei": {},
     }
 
 
@@ -150,7 +176,51 @@ def completa(grezzi):
         # e' gia' il primato, lo ha gia' battuto e non va annunciato di nuovo.
         serie, record = dati["mani_dall_ultimo_fallimento"], dati["record_mani_senza_fallimenti"]
         dati["record_battuto"] = serie > 0 and serie >= record
+    _completa_versione_5(dati, grezzi)
     return dati
+
+
+def _completa_versione_5(dati, grezzi):
+    """I campi nati con la versione 5: scudi, sorpresa, serie, precisione, raddoppi e trofei.
+
+    Un salvataggio della versione 4 non li ha e riceve i predefiniti; la
+    serie in corso prende come minimo le fiches di adesso, cosi' una rimonta
+    si conta da qui in avanti.
+    """
+    dati["scudi"] = min(dati["scudi"], regole.SCUDI_MAX)
+    if "mani_pagate" not in grezzi:
+        # Fino alla versione 4 le mani pagate si contavano dai punteggi, e
+        # fino ad allora nessun punteggio pagato poteva pagare zero.
+        dati["mani_pagate"] = sum(dati["punteggi"][nome]["conteggio"] for nome in regole.PUNTEGGI_PAGATI)
+    sorpresa = grezzi.get("sorpresa_kh")
+    dati["sorpresa_kh"] = sorpresa if sorpresa in regole.SORPRESE_PER_CHIAVE else None
+    for gruppo, chiavi in GRUPPI.items():
+        voce = grezzi.get(gruppo)
+        if isinstance(voce, dict):
+            for chiave in chiavi:
+                dati[gruppo][chiave] = _intero(voce.get(chiave), 0)
+    precisione = grezzi.get("precisione")
+    if isinstance(precisione, dict):
+        perso = precisione.get("valore_perso")
+        if isinstance(perso, (int, float)) and not isinstance(perso, bool) and perso >= 0:
+            dati["precisione"]["valore_perso"] = float(perso)
+    serie = grezzi.get("serie")
+    if isinstance(serie, dict):
+        dati["serie"]["pagate_di_fila"] = _intero(serie.get("pagate_di_fila"), 0)
+        dati["serie"]["ottime_di_fila"] = _intero(serie.get("ottime_di_fila"), 0)
+        dati["serie"]["fiches_minime"] = _intero(serie.get("fiches_minime"), dati["fiches_attuali"])
+        voci = serie.get("sfide")
+        if isinstance(voci, list):
+            dati["serie"]["sfide"] = [
+                {"chiave": v["chiave"], "fatta": v.get("fatta") is True}
+                for v in voci
+                if isinstance(v, dict) and isinstance(v.get("chiave"), str)
+            ]
+    else:
+        dati["serie"]["fiches_minime"] = dati["fiches_attuali"]
+    voci = grezzi.get("trofei")
+    if isinstance(voci, dict):
+        dati["trofei"] = {chiave: data for chiave, data in voci.items() if isinstance(chiave, str) and _data(data)}
 
 
 def _leggi_json(percorso_file):
@@ -196,6 +266,29 @@ def _carica_json(percorso_file, avvisi):
     return None
 
 
+def _carica_copia(percorso_file, avvisi):
+    """Il salvataggio principale manca, ma c'e' una sua copia: la piu' recente che si legge.
+
+    Succede se un salvataggio si interrompe fra le due sostituzioni di
+    salva_dati, per esempio perche' un antivirus tiene aperto il file
+    temporaneo: il file temporaneo ha lo stato piu' recente, la riserva quello
+    di prima. Senza questo controllo il gioco ripartirebbe da zero e al
+    salvataggio dopo cancellerebbe anche la riserva.
+    """
+    for suffisso, quale in ((".tmp", "temporanea"), (".bak", "di riserva")):
+        copia = percorso_file + suffisso
+        if not os.path.exists(copia):
+            continue
+        try:
+            grezzi = _leggi_json(copia)
+        except (OSError, ValueError):
+            continue
+        avvisi.append(f"Il salvataggio principale manca: uso la copia {quale}.")
+        return grezzi
+    avvisi.append("Il salvataggio principale manca e le copie non si leggono: riparto da un salvataggio nuovo.")
+    return None
+
+
 def _carica_pickle(percorso_file, avvisi):
     """Il salvataggio della versione 3, convertito e messo da parte, oppure None."""
     try:
@@ -224,6 +317,8 @@ def carica_dati(cartella=None):
     convertito = False
     if os.path.exists(percorso_json):
         grezzi = _carica_json(percorso_json, avvisi)
+    elif os.path.exists(percorso_json + ".tmp") or os.path.exists(percorso_json + ".bak"):
+        grezzi = _carica_copia(percorso_json, avvisi)
     elif os.path.exists(percorso_pickle):
         grezzi = _carica_pickle(percorso_pickle, avvisi)
         convertito = grezzi is not None
@@ -236,8 +331,11 @@ def carica_dati(cartella=None):
         dati["fiches_attuali"] = regole.FICHES_INIZIALI
         dati["mani_dall_ultimo_fallimento"] = 0
         dati["killer_hand_count"] = 0
+        dati["sorpresa_kh"] = None
         dati["soglia_fiches"] = 0
         dati["record_battuto"] = False
+        dati["scudi"] = 0
+        dati["serie"] = dati_nuova_serie()
         avvisi.append(f"Le fiches erano esaurite: ricevi {regole.FICHES_INIZIALI} fiches per ricominciare.")
     if convertito:
         try:

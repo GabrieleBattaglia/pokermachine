@@ -1,13 +1,18 @@
 # PokerMachine, prova sul programma principale: una sessione intera senza console e senza suoni.
-# Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Fable 5.1, UltraCode).
+# Autori: Gabriele Battaglia (IZ4APU) & ClaudIA (Claude Opus 5.5, UltraCode).
+# 24/09/2026: versione 5. Il copione incassa sempre al raddoppio, il consiglio
+# e' finto tranne che nella prova che lo chiede, e si provano scudi e sfide.
 
 import json
+import random
 
 import pytest
+from GBUtils import Mazzo
 
 import dati
 import pokermachine
 import regole
+from consiglio import Consigliere
 
 
 class Copione:
@@ -20,6 +25,12 @@ class Copione:
 
     def dgt(self, prompt="", **_):
         self.prompt.append(prompt)
+        if prompt.startswith("Posta ") and not (self.risposte and self.risposte[0].startswith("raddoppio:")):
+            # Dopo una vincita il copione incassa, salvo quando la sua prossima
+            # risposta e' scritta apposta per il raddoppio.
+            return ""
+        if self.risposte and self.risposte[0].startswith("raddoppio:"):
+            return self.risposte.pop(0).removeprefix("raddoppio:")
         if not self.risposte:
             raise AssertionError(f"il copione e' finito al prompt {prompt!r}")
         return self.risposte.pop(0)
@@ -29,12 +40,29 @@ class Copione:
         return True
 
 
+class ConsigliereFinto:
+    """Il consigliere senza motore: nessun calcolo, quindi niente consiglio e niente precisione."""
+
+    def calcola(self, *_):
+        pass
+
+    def tenute(self):
+        return None
+
+    def dimentica(self):
+        pass
+
+    def chiudi(self):
+        pass
+
+
 @pytest.fixture
 def banco(tmp_path, monkeypatch):
     """Il programma con disco, tastiera e casse sostituiti."""
     monkeypatch.setattr(dati, "cartella_programma", lambda: str(tmp_path))
     monkeypatch.setattr(pokermachine, "key", lambda *a, **k: "\r")
     monkeypatch.setattr(pokermachine, "gestisci_aggiornamento", lambda *a, **k: False)
+    monkeypatch.setattr(pokermachine, "Consigliere", ConsigliereFinto)
 
     def prepara(risposte):
         copione = Copione(risposte)
@@ -90,7 +118,7 @@ class CopioneTuttoDentro(Copione):
 
     def dgt(self, prompt="", **_):
         self.prompt.append(prompt)
-        if prompt.endswith("tieni? "):
+        if prompt.endswith("tieni? ") or prompt.startswith("Posta "):
             return ""
         if sum(1 for p in self.prompt if p.startswith("F ")) > self.LIMITE_MANI:
             raise AssertionError("cinquecento mani senza mai perdere tutto: il game over non arriva")
@@ -133,3 +161,126 @@ def test_numeri_di_carte_fuori_dal_mazzo_vengono_rifiutati(banco, capsys):
     uscita = capsys.readouterr().out
     assert uscita.count("Scrivi i numeri delle carte") == 2
     assert copione.suonati.count("errore") == 2
+
+
+SEMI = {"C": ("Cuori", 1), "Q": ("Quadri", 2), "F": ("Fiori", 3), "P": ("Picche", 4)}
+
+
+def carta(breve):
+    """Una carta dalla forma breve con il valore in numero: 7C, 12Q, 1P."""
+    valore, seme = int(breve[:-1]), breve[-1]
+    nome_seme, id_seme = SEMI[seme]
+    lettera = {1: "A", 10: "0", 11: "J", 12: "Q", 13: "K"}.get(valore, str(valore))
+    return Mazzo.Carta(
+        id=0, nome=f"{valore} di {nome_seme}", valore=valore, seme_nome=nome_seme, seme_id=id_seme, desc_breve=lettera + seme
+    )
+
+
+class MazzoFinto:
+    """Un mazzo che serve prima le carte scritte in ordine, poi il resto dei dieci mazzi mescolato sempre uguale.
+
+    Il resto conta: il consiglio guarda la scarpa vera, e una scarpa fatta
+    di carte tutte uguali gli farebbe consigliare altro.
+    """
+
+    ordine = ()
+
+    def __init__(self, *_, **__):
+        resto = [f"{valore}{seme}" for valore in range(1, 14) for seme in SEMI] * regole.NUM_MAZZI
+        for breve in self.ordine:
+            resto.remove(breve)
+        random.Random(0).shuffle(resto)
+        self.carte = [carta(b) for b in reversed([*self.ordine, *resto])]
+        self.scarti = []
+        self.ultimo_rimescolo = False
+
+    def mescola_mazzo(self):
+        pass
+
+    def pesca(self, quante):
+        return [self.carte.pop() for _ in range(min(quante, len(self.carte)))]
+
+    def scarta_carte(self, carte):
+        self.scarti.extend(carte)
+
+
+def test_il_raddoppio_sul_colore(banco, tmp_path, monkeypatch, capsys):
+    MazzoFinto.ordine = ["7C", "7Q", "7F", "2P", "9C", "5C"]
+    monkeypatch.setattr(pokermachine, "Mazzo", MazzoFinto)
+    copione = banco(["m", "12345", "raddoppio:r", "raddoppio:", ""])
+    pokermachine.main()
+    uscita = capsys.readouterr().out
+    posta = 6 * regole.TABELLA_VINCITE["Tris"]
+    assert "Raddoppio: r rosso" in uscita
+    assert "Esce 5 di Cuori." in uscita
+    assert f"Incassi {posta * 2} fiches." in uscita
+    for evento in ("raddoppio_offerto", "raddoppio_carta", "raddoppio_vinto", "raddoppio_incassato"):
+        assert evento in copione.suonati
+    with open(dati.percorso(cartella=str(tmp_path)), encoding="utf-8") as f:
+        salvato = json.load(f)
+    assert salvato["fiches_attuali"] == 200 - 6 + posta * 2
+    assert salvato["raddoppi"]["vinti"] == 1
+
+
+def test_la_killer_hand_annuncia_minimo_sorpresa_e_scudi(banco, tmp_path, capsys):
+    iniziali = dati.nuovi_dati()
+    iniziali.update(fiches_attuali=100, mani_dall_ultimo_fallimento=24, sorpresa_kh="nessun_cambio", scudi=2)
+    iniziali["serie"]["sfide"] = [{"chiave": "full", "fatta": False}]
+    dati.salva_dati(iniziali, str(tmp_path))
+    copione = banco(["1", ""])
+    pokermachine.main()
+    uscita = capsys.readouterr().out
+    minimo = regole.minimo_killer_hand(1)
+    assert regole.puntata_minima(100) < minimo
+    assert "Killer Hand numero 1, mano 25 della serie." in uscita
+    assert f"La puntata minima è {minimo} fiches." in uscita
+    assert "Sorpresa: Nessun cambio." in uscita
+    assert "Hai 2 scudi" in uscita
+    assert f"La puntata minima di questa Killer Hand è {minimo} fiches: correggo." in uscita
+    assert "Nessun cambio: la mano servita è quella finale." in uscita
+    assert not any(p.endswith("tieni? ") for p in copione.prompt)
+    assert copione.prompt[0].endswith(" D2> ")
+    assert "sorpresa_nessun_cambio" in copione.suonati
+    assert "Sfide della serie" not in uscita
+
+
+def test_le_sfide_si_annunciano_all_inizio_della_serie(banco, capsys):
+    copione = banco([""])
+    pokermachine.main()
+    uscita = capsys.readouterr().out
+    assert "Sfide della serie, ciascuna vale uno scudo:" in uscita
+    assert "sfide" in copione.suonati
+
+
+def test_il_consiglio_con_il_motore_vero(banco, monkeypatch, capsys):
+    MazzoFinto.ordine = ["12C", "12Q", "2F", "5P", "9C"]
+    monkeypatch.setattr(pokermachine, "Mazzo", MazzoFinto)
+    monkeypatch.setattr(pokermachine, "Consigliere", Consigliere)
+    copione = banco(["m", "c", "3", ""])
+    pokermachine.main()
+    uscita = capsys.readouterr().out
+    # Ordinate per seme e poi per valore sono 9C QC QQ 2F 5P: la coppia di regine e' la seconda e la terza.
+    assert "Consiglio: 23, cioè QC QQ." in uscita
+    assert "La tenuta migliore era 23, cioè QC QQ" in uscita
+    assert "consiglio" in copione.suonati
+    assert "tenuta_migliore" in copione.suonati
+
+
+def test_al_raddoppio_una_risposta_lunga_non_e_una_scommessa(banco, monkeypatch, capsys):
+    MazzoFinto.ordine = ["7C", "7Q", "7F", "2P", "9C", "5C"]
+    monkeypatch.setattr(pokermachine, "Mazzo", MazzoFinto)
+    banco(["m", "12345", "raddoppio:no", "raddoppio:", ""])
+    pokermachine.main()
+    uscita = capsys.readouterr().out
+    assert "Scrivi r o n per il colore" in uscita
+    assert "Esce " not in uscita
+
+
+def test_le_percentuali_hanno_l_articolo_giusto():
+    assert pokermachine._per_cento(1, 4) == "il 25,0"
+    assert pokermachine._per_cento(1, 12) == "l'8,3"
+    assert pokermachine._per_cento(1, 100) == "l'1,0"
+    assert pokermachine._per_cento(7, 60) == "l'11,7"
+    assert pokermachine._per_cento(4, 5) == "l'80,0"
+    assert pokermachine._per_cento(0, 5) == "lo 0,0"
+    assert pokermachine._per_cento(1, 0) == "lo 0,0"

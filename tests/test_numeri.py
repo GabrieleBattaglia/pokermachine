@@ -60,3 +60,14 @@ def test_bilancio_con_il_segno():
     assert formatta_bilancio(0) == "+0"
     assert formatta_bilancio(-100) == "-100"
     assert formatta_bilancio(28636) == "+28.6K"
+
+
+def test_quasi_un_milione_si_scrive_con_la_m():
+    assert formatta_fiches(999_949) == "999.9K"
+    assert formatta_fiches(999_950) == "1M"
+    assert formatta_fiches(999_999_999) == "1B"
+
+
+def test_un_importo_infinito_non_passa():
+    with pytest.raises(ValueError):
+        leggi_fiches("1e308k")

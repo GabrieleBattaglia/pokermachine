@@ -13,6 +13,9 @@ ignore = [
     # sposterebbe di ore il momento di ogni record.
     "DTZ005",
     "DTZ007",
+    # Il caso serve alle carte, alle sorprese della Killer Hand e alle
+    # sfide: e' un gioco, non una chiave, e il generatore di random basta.
+    "S311",
 ]
 
 [lint.per-file-ignores]
