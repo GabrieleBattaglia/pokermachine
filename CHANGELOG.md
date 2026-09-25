@@ -5,6 +5,8 @@ Il changelog nasce con la versione 4.0.0. Per le versioni precedenti il resocont
 
 ## [5.0.0] - 2026-09-25
 
+Pubblicata su GitHub il 25 settembre 2026 come release `v5.0.0`, con il solo archivio `pokermachine.zip` in allegato.
+
 La versione 5 ripensa l'equilibrio del gioco. Con dieci mazzi la tabella della 4.0.1 restituiva in media 1,66 fiches per ogni fiche puntata, e con la strategia migliore quasi 1,7: chi puntava con giudizio non perdeva mai, e l'intera partita la decideva la Killer Hand, che era una tassa più che una scelta. Adesso la tabella è più moderata e la Killer Hand è una gara, e per durare conta come si punta. Il piano sta nella issue 3, le tappe nelle issue dalla 4 alla 11.
 
 ### Aggiunto
