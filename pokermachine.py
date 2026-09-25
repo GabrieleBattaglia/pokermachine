@@ -22,6 +22,7 @@ pokermachine_data.json accanto al programma.
 """
 
 import sys
+from collections import Counter
 
 from GBUtils import Mazzo, dgt, gestisci_aggiornamento, key, manuale
 
@@ -42,6 +43,24 @@ API_RELEASE = "https://api.github.com/repos/GabrieleBattaglia/pokermachine/relea
 MANUALE = "manuale.txt"
 SCORCIATOIE = {"-": 10, ",": 25, ".": 50, ";": 75, "+": 100}
 CIFRE = set("0123456789")
+CAMBIA_TUTTE = "0"
+# I valori al plurale, per dire che cosa contiene la mano servita.
+PLURALI = {
+    1: "assi",
+    2: "due",
+    3: "tre",
+    4: "quattro",
+    5: "cinque",
+    6: "sei",
+    7: "sette",
+    8: "otto",
+    9: "nove",
+    10: "dieci",
+    11: "jack",
+    12: "regine",
+    13: "re",
+}
+SENZA_GRUPPI = ("Scala Reale", "Scala a colore", "Colore", "Scala", "Carta alta")
 CONTINUA, USCITA, GAME_OVER = "continua", "uscita", "game_over"
 SCOMMESSE = {"r": "rosso", "n": "nero", "c": "Cuori", "q": "Quadri", "f": "Fiori", "p": "Picche"}
 SPIEGAZIONE_RADDOPPIO = (
@@ -112,6 +131,27 @@ def mostra_report(dati):
         )
     else:
         print("Raddoppi: ancora nessuno.")
+    if dati["fiches_puntate"]:
+        ritorno = f"{dati['fiches_restituite'] * 100 / dati['fiches_puntate']:.1f}".replace(".", ",")
+        print(f"Ritorno personale dalla versione 5: {ritorno} fiches tornate ogni 100 puntate.")
+    else:
+        print("Ritorno personale: ancora nessuna puntata con la versione 5.")
+    killer = dati["killer"]
+    if killer["giocate"]:
+        print(
+            f"Killer Hand giocate: {killer['giocate']}; vinte {killer['vinte']}, pareggiate {killer['pareggiate']}, "
+            f"perse {killer['perse']}, salvate dallo scudo {killer['salvate']}; bonus incassati {formatta_fiches(killer['bonus'])} fiches."
+        )
+    else:
+        print("Killer Hand giocate: ancora nessuna con la versione 5.")
+    if dati["ultime_serie"]:
+        print("Ultime serie, dalla più recente:")
+        for voce in reversed(dati["ultime_serie"]):
+            mani = voce["mani"]
+            print(
+                f"{mani} {'mano' if mani == 1 else 'mani'}, al massimo {formatta_fiches(voce['fiches_massime'])} fiches, "
+                f"finita {formatta_tempo_trascorso(voce['fine'])}."
+            )
     print(f"Trofei: {len(trofei.conquistati(dati))} su {len(trofei.TROFEI)}. La lettera t li elenca.")
     for sfida, fatta in sfide.in_corso(dati):
         print(f"Sfida {'superata' if fatta else 'in corso'}: {sfida.testo}")
@@ -163,8 +203,15 @@ def salva(dati):
 
 
 def prompt_puntata(dati, numero_mano_sessione):
-    """Il prompt della puntata, entro trenta caratteri: F fiches, S serie, R primato, M mano, D scudi."""
-    prompt = f"F {formatta_fiches(dati['fiches_attuali'])} S {prossima_mano(dati)} R {dati['record_mani_senza_fallimenti']} M {numero_mano_sessione}"
+    """Il prompt della puntata, entro trenta caratteri: F fiches, S serie, R primato, M mano, D scudi.
+
+    Le lettere stanno attaccate ai numeri, F428 S110 R399 M1 D2: cosi' il
+    prompt resta nelle trenta celle anche con milioni di fiches e serie da
+    quattro cifre.
+    """
+    prompt = (
+        f"F{formatta_fiches(dati['fiches_attuali'])} S{prossima_mano(dati)} R{dati['record_mani_senza_fallimenti']} M{numero_mano_sessione}"
+    )
     if dati["scudi"]:
         prompt += f" D{dati['scudi']}"
     return prompt + "> "
@@ -225,31 +272,58 @@ def chiedi_puntata(dati, numero_mano_sessione, killer=None):
         return puntata
 
 
-def chiedi_carte_da_tenere(breve, consiglia=None):
-    """Gli indici, da zero, delle carte da tenere. Invio le cambia tutte.
+def chiedi_carte_da_tenere(breve, consiglia=None, proposta=None):
+    """Gli indici, da zero, delle carte da tenere.
 
     Il prompt e' la mano in forma breve, fatta per il braille, seguita
-    dalla domanda: sta tutto in trenta caratteri. c chiede il consiglio,
-    che consiglia stampa.
+    dalla domanda con la tenuta proposta, quella del consiglio scritta come
+    la si scriverebbe: QC 9Q JQ 6F 8F tieni 13? Sta tutto in trenta
+    caratteri. Invio da solo accetta la proposta, 0 cambia tutte le carte,
+    c chiede il consiglio a parole, che consiglia stampa. Senza proposta,
+    se il calcolo non c'e', la proposta e' 0.
     """
+    proposta = proposta or CAMBIA_TUTTE
     while True:
-        risposta = dgt(f"{breve} tieni? ", kind="s").strip()
-        if risposta == "":
-            return set()
+        risposta = dgt(f"{breve} tieni {proposta}? ", kind="s", default=proposta).strip()
         if risposta.lower() == "c" and consiglia:
             consiglia()
             continue
-        if set(risposta) <= CIFRE and all(1 <= int(c) <= regole.CARTE_PER_MANO for c in risposta):
+        if risposta == CAMBIA_TUTTE:
+            return set()
+        if risposta and set(risposta) <= CIFRE and all(1 <= int(c) <= regole.CARTE_PER_MANO for c in risposta):
             return {int(c) - 1 for c in risposta}
         play_event("errore")
         print(
-            f"Scrivi i numeri delle carte da tenere, da 1 a {regole.CARTE_PER_MANO}, tutti attaccati, "
-            "oppure invio per cambiarle tutte, o c per il consiglio."
+            f"Scrivi i numeri delle carte da tenere, da 1 a {regole.CARTE_PER_MANO}, tutti attaccati; "
+            "0 per cambiarle tutte; c per il consiglio; invio da solo per accettare la proposta."
         )
 
 
 def _ordina(mano):
-    return sorted(mano, key=lambda c: (c.seme_id, regole.rango_carta(c)))
+    """Le carte in ordine di valore, dal due all'asso, e a parita' di valore per seme: coppie e gemelle stanno vicine."""
+    return sorted(mano, key=lambda c: (regole.rango_carta(c), c.seme_id))
+
+
+def descrivi(mano, tabella=None):
+    """Il punteggio di una mano, con i valori dei gruppi quando contano: Coppia pagata, di jack."""
+    punteggio = regole.valuta_mano(mano, tabella)
+    if punteggio in SENZA_GRUPPI:
+        return punteggio
+    conta = Counter(c.valore for c in mano)
+    rango = {c.valore: regole.rango_carta(c) for c in mano}
+    gruppi = sorted((v for v, q in conta.items() if q >= 2), key=lambda v: (-conta[v], -rango[v]))
+    if not gruppi:
+        return punteggio
+    return f"{punteggio}, di " + " e di ".join(PLURALI[v] for v in gruppi)
+
+
+def proposta_di(consigliere):
+    """La tenuta consigliata come la si scrive al prompt, oppure None se il calcolo non c'e'."""
+    tenute = consigliere.tenute()
+    if tenute is None:
+        return None
+    posizioni = strategia.carte_tenute(strategia.migliore(tenute).maschera)
+    return "".join(str(i + 1) for i in posizioni) or CAMBIA_TUTTE
 
 
 def _pesca(mazzo, quante):
@@ -280,6 +354,7 @@ def annuncia_killer_hand(dati, killer):
         print(f"Hai {scudi} {'scudo' if scudi == 1 else 'scudi'}: se perdi, uno ti restituisce la puntata.")
     else:
         print("Non hai scudi.")
+    print(f"Montepremi: {formatta_fiches(partita.montepremi(dati))} fiches.")
 
 
 def consiglia(consigliere, mano, puntata):
@@ -399,13 +474,17 @@ def gioca_mano(dati, mazzo, numero_mano_sessione, consigliere, spiegato):
     consigliere.dimentica()
     if si_cambia:
         consigliere.calcola(mano, mazzo, partita.tabella_decisione(dati, killer, puntata))
-        tenute = chiedi_carte_da_tenere(" ".join(c.desc_breve for c in mano), lambda: consiglia(consigliere, mano, puntata))
+        print(f"Servita: {descrivi(mano, partita.tabella_in_vigore(killer))}.")
+        tenute = chiedi_carte_da_tenere(
+            " ".join(c.desc_breve for c in mano), lambda: consiglia(consigliere, mano, puntata), proposta_di(consigliere)
+        )
     else:
         print("Nessun cambio: la mano servita è quella finale.")
         tenute = set(range(regole.CARTE_PER_MANO))
     da_tenere = [c for i, c in enumerate(mano) if i in tenute]
     da_cambiare = [c for i, c in enumerate(mano) if i not in tenute]
     servita = mano
+    nuove = []
     if da_cambiare:
         play_event("scarto")
         print(f"Cambi {len(da_cambiare)} carte." if len(da_cambiare) > 1 else "Cambi una carta.")
@@ -417,7 +496,9 @@ def gioca_mano(dati, mazzo, numero_mano_sessione, consigliere, spiegato):
         print("Tieni tutte le carte.")
     print("Mano finale:")
     for carta in mano:
-        print(f"{carta.nome}.")
+        # Le carte gemelle sono uguali anche come tuple: la nuova si riconosce per identita'.
+        nuova = any(carta is n for n in nuove)
+        print(f"{carta.nome}{', nuova' if nuova else ''}.")
     punteggio = regole.valuta_mano(mano, partita.tabella_in_vigore(killer))
     # La mano finale torna negli scarti: e' cio' che tiene in gioco tutte le
     # carte e lascia al mazzo di rimescolarle quando servono.

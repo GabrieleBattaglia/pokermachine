@@ -23,6 +23,7 @@ def giocatore(fiches=1000, trofei_presi=True, **campi):
     dati["fiches_attuali"] = fiches
     dati["soglia_fiches"] = regole.soglia_raggiunta(fiches)
     dati["serie"]["fiches_minime"] = fiches
+    dati["serie"]["fiches_massime"] = fiches
     if trofei_presi:
         dati["trofei"] = {chiave: adesso() for chiave in trofei.CHIAVI}
     dati.update(campi)
@@ -374,3 +375,38 @@ def test_la_coppia_resa_muta_suona_come_una_perdita():
 def test_il_game_over_alla_prima_mano_dice_una_mano():
     eventi = partita.esito_mano(giocatore(200), 200, "Carta alta")
     assert "Serie chiusa a 1 mano," in eventi[-1].testo
+
+
+def test_il_montepremi_annuncia_le_soglie_una_volta_e_riparte_dopo_la_vincita():
+    dati = giocatore(10_000_000, montepremi_centesimi=99_950)
+    eventi = partita.esito_mano(dati, 100, "Carta alta")
+    assert "montepremi_soglia" in nomi(eventi)
+    assert dati["montepremi_soglia"] == 1000
+    assert "montepremi_soglia" not in nomi(partita.esito_mano(dati, 100, "Carta alta"))
+    partita.esito_mano(dati, 10, "Poker d'assi")
+    assert dati["montepremi_soglia"] == 0
+    assert dati["montepremi_vinti"] == 1
+
+
+def test_il_bilancio_delle_killer_hand_e_il_ritorno_personale():
+    dati = giocatore(1000, scudi=1)
+    partita.esito_mano(dati, 100, "Tris", killer=killer())
+    partita.esito_mano(dati, 100, "Coppia pagata", killer=killer(2))
+    partita.esito_mano(dati, 100, "Carta alta", killer=killer(3))
+    partita.esito_mano(dati, 100, "Carta alta", killer=killer(4))
+    conti = dati["killer"]
+    assert (conti["giocate"], conti["vinte"], conti["pareggiate"], conti["salvate"], conti["perse"]) == (4, 1, 1, 1, 1)
+    assert conti["bonus"] == 100 * (T["Tris"] - 1) * (regole.KILLER_HAND_MOLTIPLICATORE - 1)
+    assert dati["fiches_puntate"] == 400
+    assert dati["fiches_restituite"] == dati["fiches_attuali"] - 1000 + 400
+
+
+def test_le_ultime_serie_si_ricordano_al_game_over():
+    dati = giocatore(100, mani_dall_ultimo_fallimento=41)
+    partita.esito_mano(dati, 10, "Tris")
+    partita.esito_mano(dati, dati["fiches_attuali"], "Carta alta")
+    assert dati["ultime_serie"][-1]["mani"] == 43
+    assert dati["ultime_serie"][-1]["fiches_massime"] == 100 + 10 * (T["Tris"] - 1)
+    for _ in range(12):
+        partita.esito_mano(dati, dati["fiches_attuali"], "Carta alta")
+    assert len(dati["ultime_serie"]) == 10

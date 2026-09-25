@@ -159,3 +159,18 @@ def test_senza_il_file_principale_si_riparte_dalla_copia_piu_recente(tmp_path):
     letto, avvisi = dati.carica_dati(cartella)
     assert letto["mani_giocate"] == 100
     assert any("copia di riserva" in a for a in avvisi)
+
+
+def test_i_campi_della_tappa_8_si_risanano():
+    letto = dati.completa(
+        {
+            "montepremi_centesimi": 1_234_500,
+            "ultime_serie": [{"mani": 30, "fiches_massime": 900, "fine": "ieri"}, "no"],
+            "killer": {"vinte": 3, "perse": -2},
+        }
+    )
+    assert letto["montepremi_soglia"] == 10_000
+    assert letto["ultime_serie"] == [{"mani": 30, "fiches_massime": 900, "fine": None}]
+    assert letto["killer"]["vinte"] == 3
+    assert letto["killer"]["perse"] == 0
+    assert letto["fiches_puntate"] == 0

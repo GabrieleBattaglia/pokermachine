@@ -58,9 +58,12 @@ PUNTEGGI_SCUDO = ("Cinque gemelle", "Scala Reale", "Full a colore", "Scala a col
 
 # Il montepremi: MONTEPREMI_PERCENTUALE di ogni puntata vi si accumula, lo
 # paga la macchina e non viene tolto dalla puntata. Lo vince chi fa uno dei
-# PUNTEGGI_MONTEPREMI, e sopravvive al game over.
+# PUNTEGGI_MONTEPREMI, cioe' le mani degli scudi piu' il Poker d'assi, circa
+# una mano ogni 460, e sopravvive al game over. Quando supera una delle
+# MONTEPREMI_SOGLIE il gioco lo annuncia.
 MONTEPREMI_PERCENTUALE = 1
-PUNTEGGI_MONTEPREMI = ("Cinque gemelle", "Scala Reale", "Full a colore", "Scala a colore", "Poker gemello", "Super Poker")
+PUNTEGGI_MONTEPREMI = (*PUNTEGGI_SCUDO, "Poker d'assi")
+MONTEPREMI_SOGLIE = (1000, 10000, 100000, 1000000)
 
 COPPIE = ("Coppia pagata", "Coppia gemella pagata", "Coppia gemella")
 

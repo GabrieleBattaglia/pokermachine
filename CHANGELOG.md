@@ -15,7 +15,10 @@ La versione 5 ripensa l'equilibrio del gioco. Con dieci mazzi la tabella della 4
 - **Gli scudi.** Uno scudo restituisce la puntata di una Killer Hand persa. Se ne tengono al massimo tre; arrivano dalle mani rarissime e dalle sfide. Il prompt della puntata li mostra con la lettera D.
 - **Il consiglio.** Al prompt delle carte la lettera c dice la tenuta migliore, calcolata in modo esatto su tutte le carte che possono arrivare dal mazzo com'è in quel momento, con la tabella in vigore, la Killer Hand, la sorpresa, gli scudi e il montepremi. Dopo ogni mano, se la tenuta scelta non era la migliore, il gioco dice quante fiches in media rendeva di più, e le statistiche contano la precisione. Il motore del calcolo è stato verificato sul Jacks or Better a un mazzo, dove dà il ritorno teorico noto del 99,5439 per cento.
 - **Il raddoppio.** Dopo ogni vincita si può giocare quanto è appena tornato indietro: rosso o nero raddoppia la posta, il seme giusto la quadruplica, altrimenti la posta è persa. Le scommesse sono eque, fino a cinque di fila.
-- **Il montepremi.** L'uno per cento di ogni puntata va in un premio pagato dalla macchina, che resta salvato fra le sessioni e dopo il game over e si vince con le mani rarissime.
+- **Il montepremi.** L'uno per cento di ogni puntata va in un premio pagato dalla macchina, che resta salvato fra le sessioni e dopo il game over e si vince con le mani rarissime e con il Poker d'assi, circa una mano ogni 460. Il gioco lo ricorda all'avvio, a ogni Killer Hand e nelle statistiche, e annuncia con un suono quando supera mille, diecimila, centomila e un milione di fiches.
+- **La tenuta proposta nel prompt.** Il prompt delle carte propone la tenuta migliore dopo la parola tieni, per esempio 6F 8F 9Q JQ QC tieni 45?, e invio da solo la accetta. Lo zero cambia tutte le carte.
+- **La mano servita annunciata**, per esempio Servita: Coppia pagata, di jack, e le carte appena arrivate segnate con la parola nuova nella mano finale.
+- **Statistiche nuove**: il ritorno personale, cioè le fiches tornate ogni cento puntate, il bilancio delle Killer Hand e le ultime dieci serie.
 - **Le sfide.** All'inizio di ogni serie il gioco estrae tre sfide; ciascuna superata regala uno scudo.
 - **I trofei.** Ventidue traguardi da conquistare una volta sola, ciascuno con il suo annuncio e un suono per famiglia; la lettera t al prompt della puntata li elenca.
 - Trenta suoni nuovi della famiglia pokermachine nella collezione condivisa Acu_Collection.json, e ascolta_suoni.py che con l'argomento nuovi fa sentire solo quelli.
@@ -25,6 +28,9 @@ La versione 5 ripensa l'equilibrio del gioco. Con dieci mazzi la tabella della 4
 - **La tabella dei punteggi.** Tarata con il motore della strategia ottima e con migliaia di serie simulate, rende il 128,6 per cento, e il montepremi aggiunge circa un punto. Restano come prima Coppia pagata 1, Doppia coppia 2, Super Poker 40, Scala a colore 55 e Scala Reale 250. Cambiano il Tris, da 3 a 2, il Full da 9 a 4, il Colore da 6 a 4 e il Poker, che si divide: 25 quello d'assi, 10 dal 2 al 4, 6 dal 5 al re. La Scala sale da 4 a 6, perché con dieci mazzi è più rara di full e colore. Le gemelle: Coppia gemella 1, Coppia gemella pagata 2, Tris gemello 6, Poker gemello 50, Cinque gemelle 2500; il Full a colore 55.
 - **Le statistiche** hanno gli scudi, il montepremi, la precisione delle tenute, i raddoppi, i trofei e le sfide in corso. Le mani pagate si contano con un contatore loro, perché con la sorpresa delle coppie mute una coppia può pagare zero.
 - Il salvataggio passa al formato 2. Un salvataggio della versione 4 si legge senza perdere niente: i conteggi dei punteggi restano nelle categorie dove sono stati fatti, e le novità partono da zero.
+- **Le carte in ordine di valore**, dal due all'asso, invece che per seme: coppie, tris e gemelle stanno vicine.
+- **Il prompt della puntata** tiene le lettere attaccate ai numeri, F428 S110 R399 M1, e così resta nelle trenta celle anche con milioni di fiches e serie lunghe.
+- **Invio al prompt delle carte** accetta la tenuta proposta; per cambiare tutte le carte si scrive zero.
 - La guida è riscritta per la versione 5, un paragrafo per riga.
 
 ### Tolto

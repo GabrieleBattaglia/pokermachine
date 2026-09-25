@@ -47,12 +47,17 @@ CHIAVI_INTERE = (
     "scudi",
     "montepremi_centesimi",
     "montepremi_vinti",
+    "montepremi_soglia",
     "mani_pagate",
+    "fiches_puntate",
+    "fiches_restituite",
 )
+ULTIME_SERIE = 10
 # I gruppi di contatori della versione 5, ciascuno un dizionario di interi.
 GRUPPI = {
     "precisione": ("tenute", "ottime", "di_fila"),
     "raddoppi": ("tentati", "vinti", "di_fila", "fiches_vinte", "fiches_perse"),
+    "killer": ("giocate", "vinte", "pareggiate", "perse", "salvate", "bonus"),
 }
 CHIAVI_DATE = (
     "data_ultimo_fallimento",
@@ -90,7 +95,13 @@ def percorso_risorsa(nome):
 
 def dati_nuova_serie():
     """Lo stato di una serie appena cominciata."""
-    return {"pagate_di_fila": 0, "ottime_di_fila": 0, "fiches_minime": regole.FICHES_INIZIALI, "sfide": []}
+    return {
+        "pagate_di_fila": 0,
+        "ottime_di_fila": 0,
+        "fiches_minime": regole.FICHES_INIZIALI,
+        "fiches_massime": regole.FICHES_INIZIALI,
+        "sfide": [],
+    }
 
 
 def nuovi_dati():
@@ -113,7 +124,10 @@ def nuovi_dati():
         "scudi": 0,
         "montepremi_centesimi": 0,
         "montepremi_vinti": 0,
+        "montepremi_soglia": 0,
         "mani_pagate": 0,
+        "fiches_puntate": 0,
+        "fiches_restituite": 0,
         "punteggi": {nome: {"conteggio": 0, "ultima_realizzazione": None} for nome in regole.NOMI_PUNTEGGI},
         "vincita_massima": 0,
         "data_vincita_massima": None,
@@ -123,8 +137,15 @@ def nuovi_dati():
         "serie": dati_nuova_serie(),
         "precisione": {"tenute": 0, "ottime": 0, "di_fila": 0, "valore_perso": 0.0},
         "raddoppi": {"tentati": 0, "vinti": 0, "di_fila": 0, "fiches_vinte": 0, "fiches_perse": 0},
+        "killer": {"giocate": 0, "vinte": 0, "pareggiate": 0, "perse": 0, "salvate": 0, "bonus": 0},
+        "ultime_serie": [],
         "trofei": {},
     }
+
+
+def _soglia_montepremi(montepremi):
+    """La soglia piu' alta che quel montepremi ha gia' superato, zero se nessuna."""
+    return max((s for s in regole.MONTEPREMI_SOGLIE if montepremi >= s), default=0)
 
 
 def _intero(valore, predefinito):
@@ -209,6 +230,7 @@ def _completa_versione_5(dati, grezzi):
         dati["serie"]["pagate_di_fila"] = _intero(serie.get("pagate_di_fila"), 0)
         dati["serie"]["ottime_di_fila"] = _intero(serie.get("ottime_di_fila"), 0)
         dati["serie"]["fiches_minime"] = _intero(serie.get("fiches_minime"), dati["fiches_attuali"])
+        dati["serie"]["fiches_massime"] = _intero(serie.get("fiches_massime"), dati["fiches_attuali"])
         voci = serie.get("sfide")
         if isinstance(voci, list):
             dati["serie"]["sfide"] = [
@@ -218,6 +240,16 @@ def _completa_versione_5(dati, grezzi):
             ]
     else:
         dati["serie"]["fiches_minime"] = dati["fiches_attuali"]
+        dati["serie"]["fiches_massime"] = dati["fiches_attuali"]
+    if "montepremi_soglia" not in grezzi:
+        dati["montepremi_soglia"] = _soglia_montepremi(dati["montepremi_centesimi"] // 100)
+    voci = grezzi.get("ultime_serie")
+    if isinstance(voci, list):
+        dati["ultime_serie"] = [
+            {"mani": _intero(v.get("mani"), 0), "fiches_massime": _intero(v.get("fiches_massime"), 0), "fine": _data(v.get("fine"))}
+            for v in voci[-ULTIME_SERIE:]
+            if isinstance(v, dict)
+        ]
     voci = grezzi.get("trofei")
     if isinstance(voci, dict):
         dati["trofei"] = {chiave: data for chiave, data in voci.items() if isinstance(chiave, str) and _data(data)}

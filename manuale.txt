@@ -13,8 +13,8 @@ Le carte di ogni mano tornano fra gli scarti, e quando il mazzo finisce gli scar
 
 3. Il prompt della puntata
 A ogni mano compare una riga corta, fatta per stare in trenta celle del display braille e lasciare spazio a ciò che si scrive, per esempio:
-F 428 S 110 R 399 M 1 D2>
-F sono le fiches, il gruzzolo attuale. S è la serie, cioè il numero della mano che sta per cominciare, contato dall'ultimo fallimento. R è il record di mani senza fallimenti. M è la mano di questa sessione. D sono gli scudi, e compare solo quando se ne ha almeno uno.
+F428 S110 R399 M1 D2>
+Ogni lettera sta attaccata al suo numero, così la riga resta corta anche con milioni di fiches e serie lunghe. F sono le fiches, il gruzzolo attuale. S è la serie, cioè il numero della mano che sta per cominciare, contato dall'ultimo fallimento. R è il record di mani senza fallimenti. M è la mano di questa sessione. D sono gli scudi, e compare solo quando se ne ha almeno uno.
 Le fiches da mille in su si leggono con un prefisso, K per le migliaia e M per i milioni, con al massimo due decimali: 3.52K sono 3520 fiches, 195K sono centonovantacinquemila, 1.23M un milione e duecentotrentamila. La stessa forma compatta si usa in tutti i messaggi e nelle statistiche. I conteggi di mani e di punteggi restano esatti.
 Al prompt si può scrivere:
 un numero, cioè le fiches da puntare, anche con il prefisso k per le migliaia o m per i milioni: 1k punta mille, 1.5k o 1,5k millecinquecento, 2m due milioni;
@@ -31,11 +31,12 @@ invio da solo, per uscire dal gioco salvando.
 Una puntata sotto il minimo viene alzata al minimo, e il gioco lo dice. Una puntata sopra le fiches disponibili viene rifiutata.
 
 4. Le carte e il consiglio
-Le cinque carte arrivano ordinate per seme e per valore, numerate da uno a cinque, ciascuna sulla sua riga. Poi il prompt le ripete in forma breve, la lettera del valore seguita da quella del seme, e chiede quali tenere, in una riga che sta nelle trenta celle del display braille:
-QC 9Q JQ 6F 8F tieni?
+Le cinque carte arrivano ordinate per valore, dal due all'asso, e a parità di valore per seme, così coppie, tris e carte gemelle stanno vicine. Sono numerate da uno a cinque, ciascuna sulla sua riga, e subito dopo il gioco dice che cosa contiene la mano servita, per esempio: Servita: Coppia pagata, di jack.
+Poi il prompt ripete le carte in forma breve, la lettera del valore seguita da quella del seme, e chiede quali tenere, proponendo la tenuta migliore, in una riga che sta nelle trenta celle del display braille:
+6F 8F 9Q JQ QC tieni 45?
 I valori sono A per l'asso, le cifre da 2 a 9, 0 per il dieci, J per il jack, Q per la regina, K per il re. I semi sono C per i cuori, Q per i quadri, F per i fiori, P per le picche.
-Si scrivono i numeri delle carte da tenere, tutti attaccati e senza spazi: 145 tiene la prima, la quarta e la quinta. Invio da solo le cambia tutte. Le carte cambiate vengono sostituite e la mano finale viene letta e valutata.
-La lettera c, allo stesso prompt, chiede il consiglio: il gioco dice la tenuta migliore, scritta come la si scriverebbe al prompt e seguita dalle carte, per esempio: Consiglio: 23, cioè QC QQ. Dice anche quante fiches rende in media, con la puntata fatta.
+Il numero dopo tieni è la proposta: invio da solo la accetta. Altrimenti si scrivono i numeri delle carte da tenere, tutti attaccati e senza spazi: 145 tiene la prima, la quarta e la quinta. Lo zero cambia tutte le carte, e quando la proposta è cambiarle tutte il prompt dice tieni 0. Le carte cambiate vengono sostituite e la mano finale viene letta e valutata, con la parola nuova dopo ogni carta appena arrivata.
+La lettera c, allo stesso prompt, dice il consiglio a parole: la tenuta migliore, scritta come la si scriverebbe al prompt e seguita dalle carte, per esempio: Consiglio: 45, cioè JQ QC. Dice anche quante fiches rende in media, con la puntata fatta.
 Il consiglio non è un'opinione: è un calcolo esatto. Per ciascuna delle trentadue tenute possibili il gioco passa in rassegna tutte le carte che potrebbero arrivare dal mazzo com'è in quel momento, con le carte già uscite, e sceglie la tenuta che in media rende di più con la tabella in vigore, compresi il bonus della Killer Hand, la regola a sorpresa, gli scudi e il montepremi. Con dieci mazzi la strategia giusta non è quella del poker classico: per esempio, con un Poker servito conviene quasi sempre cambiare la quinta carta, perché il quinto valore uguale arriva spesso.
 Il calcolo si fa mentre si leggono le carte, quindi il consiglio arriva subito. Dopo ogni mano, se la tenuta scelta non era la migliore, il gioco lo dice, con quante fiches in media rendeva di più. Le statistiche contano la precisione: quante tenute ottime su quante, e quante fiches si sono lasciate per strada.
 
@@ -92,8 +93,8 @@ Si scopre una carta dal mazzo. Con r si scommette sul rosso e con n sul nero: se
 Le due scommesse sono eque: in media valgono esattamente quanto si rischia, quindi il raddoppio non aiuta né danneggia chi gioca, aggiunge solo emozione. Si può raddoppiare al massimo cinque volte di fila, poi la posta si incassa da sola. Se la posta persa era tutto il gruzzolo, la partita finisce.
 
 10. Il montepremi
-L'uno per cento di ogni puntata va nel montepremi, che lo paga la macchina: la puntata non si riduce. Il montepremi si vince con le mani rarissime, cioè le stesse che regalano gli scudi, e resta salvato fra le sessioni e anche dopo il game over: una serie nuova può vincere ciò che hanno accumulato le serie precedenti.
-Il gioco dice quanto vale all'inizio di ogni sessione, e le statistiche lo ripetono.
+L'uno per cento di ogni puntata va nel montepremi, che lo paga la macchina: la puntata non si riduce. Il montepremi si vince con le mani rarissime che regalano gli scudi e con il Poker d'assi, insieme circa una mano ogni 460, e resta salvato fra le sessioni e anche dopo il game over: una serie nuova può vincere ciò che hanno accumulato le serie precedenti.
+Il gioco dice quanto vale all'inizio di ogni sessione e a ogni Killer Hand, e le statistiche lo ripetono. Quando supera mille, diecimila, centomila e un milione di fiches lo annuncia con il suo suono, una volta per soglia finché qualcuno non lo vince.
 
 11. Le sfide
 All'inizio di ogni serie il gioco estrae tre sfide e le annuncia: per esempio fare un Full, vincere una Killer Hand o fare cinque mani pagate di fila. Ciascuna sfida superata regala uno scudo, e il gioco lo dice con il suo suono. Le sfide in corso si rileggono nelle statistiche.
@@ -109,7 +110,7 @@ Il gioco annuncia, con un suono ciascuno, il nuovo record di vincita in una mano
 Quando le fiches finiscono la partita si chiude. Il gioco dice quante mani è durata la serie e qual è il primato, conta il fallimento, e al prossimo avvio si riparte con duecento fiches, senza scudi e con tre sfide nuove.
 
 15. Le statistiche
-All'avvio, con r al prompt e all'uscita, il gioco legge le statistiche di sempre: lanci del programma, mani giocate, mani dall'ultimo fallimento, record, fallimenti con la data dell'ultimo, fiches attuali, scudi, guadagnate e perdute con il bilancio, vincita e perdita massima in una mano con le date, ultima giocata, montepremi, precisione delle tenute, raddoppi, trofei conquistati, sfide in corso, la percentuale di mani pagate, e per ogni punteggio quante volte è uscito, la sua percentuale sulle mani giocate e quando è uscito l'ultima volta. All'uscita si sente anche il bilancio della sessione appena giocata.
+All'avvio, con r al prompt e all'uscita, il gioco legge le statistiche di sempre: lanci del programma, mani giocate, mani dall'ultimo fallimento, record, fallimenti con la data dell'ultimo, fiches attuali, scudi, guadagnate e perdute con il bilancio, vincita e perdita massima in una mano con le date, ultima giocata, montepremi, precisione delle tenute, raddoppi, il ritorno personale, cioè quante fiches sono tornate ogni cento puntate, il bilancio delle Killer Hand, con quante ne hai giocate, vinte, pareggiate, perse e salvate dallo scudo e quanti bonus hai incassato, le ultime dieci serie con la loro durata e le fiches massime, trofei conquistati, sfide in corso, la percentuale di mani pagate, e per ogni punteggio quante volte è uscito, la sua percentuale sulle mani giocate e quando è uscito l'ultima volta. All'uscita si sente anche il bilancio della sessione appena giocata.
 
 16. Il salvataggio
 Tutto sta in pokermachine_data.json, accanto al programma, scritto dopo ogni mano. Accanto resta una copia di riserva con estensione .bak: se il file principale si rompe, il gioco riparte da quella e lo dice. Il salvataggio delle versioni precedenti si legge senza perdere niente: i conteggi dei punteggi restano dove sono stati fatti, e le novità della versione 5 partono da zero.

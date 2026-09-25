@@ -46,6 +46,7 @@ EVENTI = {
     "scudo_usato": "pokermachine_scudo_usato",
     "scudi_pieni": "pokermachine_scudi_pieni",
     "montepremi_vinto": "pokermachine_montepremi_vinto",
+    "montepremi_soglia": "pokermachine_montepremi_soglia",
     "raddoppio_offerto": "pokermachine_raddoppio_offerto",
     "raddoppio_carta": "pokermachine_raddoppio_carta",
     "raddoppio_vinto": "pokermachine_raddoppio_vinto",

@@ -23,8 +23,13 @@ class Copione:
         self.prompt = []
         self.suonati = []
 
-    def dgt(self, prompt="", **_):
+    def dgt(self, prompt="", default=None, **_):
         self.prompt.append(prompt)
+        risposta = self._risposta(prompt)
+        # Come dgt vera: invio a vuoto restituisce il predefinito, se c'e'.
+        return default if risposta == "" and default is not None else risposta
+
+    def _risposta(self, prompt):
         if prompt.startswith("Posta ") and not (self.risposte and self.risposte[0].startswith("raddoppio:")):
             # Dopo una vincita il copione incassa, salvo quando la sua prossima
             # risposta e' scritta apposta per il raddoppio.
@@ -95,9 +100,9 @@ def test_due_mani_e_uscita(banco, tmp_path, capsys):
     assert "Tieni tutte" not in uscita
     assert "Mano finale:" in uscita
     assert "Hai iniziato la sessione con 200 fiches." in uscita
-    assert copione.prompt[0].startswith("F 200 S 1 R 0 M 1>")
-    assert copione.prompt[-1].startswith("F ")
-    assert any(p.endswith(" tieni? ") for p in copione.prompt)
+    assert copione.prompt[0].startswith("F200 S1 R0 M1>")
+    assert copione.prompt[-1].startswith("F")
+    assert any(" tieni " in p for p in copione.prompt)
     assert all(len(p) <= 30 for p in copione.prompt)
     for evento in ("avvio", "mescola", "errore", "statistiche", "puntata_minima", "puntata", "distribuzione", "scarto", "chiusura"):
         assert evento in copione.suonati
@@ -116,11 +121,10 @@ class CopioneTuttoDentro(Copione):
 
     LIMITE_MANI = 500
 
-    def dgt(self, prompt="", **_):
-        self.prompt.append(prompt)
-        if prompt.endswith("tieni? ") or prompt.startswith("Posta "):
+    def _risposta(self, prompt):
+        if " tieni " in prompt or prompt.startswith("Posta "):
             return ""
-        if sum(1 for p in self.prompt if p.startswith("F ")) > self.LIMITE_MANI:
+        if sum(1 for p in self.prompt if p.startswith("F") and p.endswith("> ")) > self.LIMITE_MANI:
             raise AssertionError("cinquecento mani senza mai perdere tutto: il game over non arriva")
         return "+"
 
@@ -134,7 +138,7 @@ def test_il_game_over_conta_un_fallimento_solo_e_riparte_da_duecento(banco, tmp_
     assert "Fiches esaurite, game over." in uscita
     assert "Chiudi con 0 fiches: -200, cioè -100,0 per cento." in uscita
     assert "game_over" in copione.suonati
-    mani = sum(1 for p in copione.prompt if p.endswith("tieni? "))
+    mani = sum(1 for p in copione.prompt if " tieni " in p)
     with open(dati.percorso(cartella=str(tmp_path)), encoding="utf-8") as f:
         salvato = json.load(f)
     assert salvato["fallimenti"] == 1
@@ -238,7 +242,7 @@ def test_la_killer_hand_annuncia_minimo_sorpresa_e_scudi(banco, tmp_path, capsys
     assert "Hai 2 scudi" in uscita
     assert f"La puntata minima di questa Killer Hand è {minimo} fiches: correggo." in uscita
     assert "Nessun cambio: la mano servita è quella finale." in uscita
-    assert not any(p.endswith("tieni? ") for p in copione.prompt)
+    assert not any(" tieni " in p for p in copione.prompt)
     assert copione.prompt[0].endswith(" D2> ")
     assert "sorpresa_nessun_cambio" in copione.suonati
     assert "Sfide della serie" not in uscita
@@ -259,9 +263,11 @@ def test_il_consiglio_con_il_motore_vero(banco, monkeypatch, capsys):
     copione = banco(["m", "c", "3", ""])
     pokermachine.main()
     uscita = capsys.readouterr().out
-    # Ordinate per seme e poi per valore sono 9C QC QQ 2F 5P: la coppia di regine e' la seconda e la terza.
-    assert "Consiglio: 23, cioè QC QQ." in uscita
-    assert "La tenuta migliore era 23, cioè QC QQ" in uscita
+    # Ordinate per valore sono 2F 5P 9C QC QQ: la coppia di regine e' la quarta e la quinta.
+    assert "Servita: Coppia pagata, di regine." in uscita
+    assert any(p.endswith(" tieni 45? ") for p in copione.prompt)
+    assert "Consiglio: 45, cioè QC QQ." in uscita
+    assert "La tenuta migliore era 45, cioè QC QQ" in uscita
     assert "consiglio" in copione.suonati
     assert "tenuta_migliore" in copione.suonati
 
@@ -284,3 +290,39 @@ def test_le_percentuali_hanno_l_articolo_giusto():
     assert pokermachine._per_cento(4, 5) == "l'80,0"
     assert pokermachine._per_cento(0, 5) == "lo 0,0"
     assert pokermachine._per_cento(1, 0) == "lo 0,0"
+
+
+def test_invio_accetta_la_tenuta_proposta(banco, tmp_path, monkeypatch, capsys):
+    MazzoFinto.ordine = ["12C", "12Q", "2F", "5P", "9C"]
+    monkeypatch.setattr(pokermachine, "Mazzo", MazzoFinto)
+    monkeypatch.setattr(pokermachine, "Consigliere", Consigliere)
+    banco(["m", "", ""])
+    pokermachine.main()
+    uscita = capsys.readouterr().out
+    assert "Cambi 3 carte." in uscita
+    assert "La tenuta migliore era" not in uscita
+    assert "nuova." in uscita
+    with open(dati.percorso(cartella=str(tmp_path)), encoding="utf-8") as f:
+        salvato = json.load(f)
+    assert salvato["precisione"] == {"tenute": 1, "ottime": 1, "di_fila": 1, "valore_perso": 0.0}
+
+
+def test_zero_cambia_tutte_le_carte(banco, capsys):
+    copione = banco(["m", "0", ""])
+    pokermachine.main()
+    assert "Cambi 5 carte." in capsys.readouterr().out
+    assert "scarto" in copione.suonati
+
+
+def test_la_servita_si_descrive_con_i_valori_dei_gruppi():
+    assert pokermachine.descrivi([carta(b) for b in ("11C", "11Q", "2F", "5P", "9C")]) == "Coppia pagata, di jack"
+    assert pokermachine.descrivi([carta(b) for b in ("5C", "5Q", "13F", "13P", "9C")]) == "Doppia coppia, di re e di cinque"
+    assert pokermachine.descrivi([carta(b) for b in ("7C", "7Q", "7F", "1P", "1C")]) == "Full, di sette e di assi"
+    assert pokermachine.descrivi([carta(b) for b in ("2C", "5C", "9C", "11C", "13C")]) == "Colore"
+    assert pokermachine.descrivi([carta(b) for b in ("2C", "5Q", "9C", "11F", "13C")]) == "Carta alta"
+
+
+def test_il_prompt_della_puntata_sta_in_trenta_caratteri_anche_con_numeri_grandi():
+    stato = dati.nuovi_dati()
+    stato.update(fiches_attuali=999_990_000, mani_dall_ultimo_fallimento=9998, record_mani_senza_fallimenti=9999, scudi=3)
+    assert len(pokermachine.prompt_puntata(stato, 999)) <= 30

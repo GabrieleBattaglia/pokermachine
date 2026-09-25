@@ -25,7 +25,7 @@ from collections import namedtuple
 import regole
 import sfide
 import trofei
-from dati import adesso, dati_nuova_serie
+from dati import ULTIME_SERIE, adesso, dati_nuova_serie
 from numeri import formatta_bilancio, formatta_fiches
 
 Evento = namedtuple("Evento", ["nome", "testo"])
@@ -154,16 +154,40 @@ def tabella_decisione(dati, killer, puntata):
 
 
 def _montepremi(dati, puntata, punteggio, eventi):
-    """Accumula la percentuale della puntata e, con le mani rarissime, paga. Restituisce quanto ha pagato."""
+    """Accumula la percentuale della puntata e, con le mani rarissime, paga. Restituisce quanto ha pagato.
+
+    Se accumulando supera una soglia, lo annuncia: una volta sola per soglia,
+    finche' qualcuno non lo vince e il conto riparte.
+    """
     dati["montepremi_centesimi"] += puntata * regole.MONTEPREMI_PERCENTUALE
     premio = montepremi(dati)
     if punteggio not in regole.PUNTEGGI_MONTEPREMI or premio < 1:
+        soglia = max((s for s in regole.MONTEPREMI_SOGLIE if premio >= s), default=0)
+        if soglia > dati["montepremi_soglia"]:
+            dati["montepremi_soglia"] = soglia
+            eventi.append(Evento("montepremi_soglia", f"Il montepremi supera {formatta_fiches(soglia)} fiches."))
         return 0
     dati["montepremi_centesimi"] -= premio * 100
     dati["montepremi_vinti"] += 1
+    dati["montepremi_soglia"] = 0
     dati["fiches_guadagnate"] += premio
     eventi.append(Evento("montepremi_vinto", f"Vinci il montepremi: {formatta_fiches(premio)} fiches."))
     return premio
+
+
+def _conta_killer(dati, killer, puntata, restituito, salvata):
+    """Il bilancio delle Killer Hand: giocate, vinte, pareggiate, perse, salvate dallo scudo, bonus incassati."""
+    conti = dati["killer"]
+    conti["giocate"] += 1
+    if restituito > puntata:
+        conti["vinte"] += 1
+        conti["bonus"] += (restituito - puntata) * (killer.sorpresa.moltiplicatore - 1)
+    elif restituito == puntata:
+        conti["pareggiate"] += 1
+    elif salvata:
+        conti["salvate"] += 1
+    else:
+        conti["perse"] += 1
 
 
 def _seme_unico(carte):
@@ -183,6 +207,7 @@ def _nuovo_saldo(dati, fiches, eventi):
     """Cio' che il saldo nuovo tocca, dopo una mano o un raddoppio: il minimo della serie e le soglie."""
     stato = dati["serie"]
     stato["fiches_minime"] = min(stato["fiches_minime"], fiches)
+    stato["fiches_massime"] = max(stato["fiches_massime"], fiches)
     soglia = regole.soglia_raggiunta(fiches)
     if soglia > dati["soglia_fiches"]:
         dati["soglia_fiches"] = soglia
@@ -219,6 +244,7 @@ def esito_mano(dati, puntata, punteggio, killer=None, carte=()):
         dati["sorpresa_kh"] = None
     restituito = regole.calcola_vincita(punteggio, puntata, tabella_in_vigore(killer))
     vinta = restituito > puntata
+    salvata = False
     if restituito >= puntata:
         dati["mani_pagate"] += 1
     if vinta:
@@ -230,8 +256,11 @@ def esito_mano(dati, puntata, punteggio, killer=None, carte=()):
         eventi.append(Evento(None, f"Perdi la puntata di {formatta_fiches(puntata)} fiches, ma hai uno scudo."))
         _scudo_usato(dati, puntata, eventi)
         fiches += puntata
+        salvata = True
     else:
         _perdita(dati, puntata, eventi)
+    if killer:
+        _conta_killer(dati, killer, puntata, restituito, salvata)
     # Con le coppie mute, o con tutto o niente, una coppia pagata non paga:
     # il suono dev'essere quello della mano persa, non quello del pareggio.
     muta = restituito < puntata and regole.TABELLA_VINCITE.get(punteggio, 0) >= 1
@@ -240,6 +269,9 @@ def esito_mano(dati, puntata, punteggio, killer=None, carte=()):
         guadagna_scudo(dati, f"{punteggio}!", eventi)
     vinto_montepremi = _montepremi(dati, puntata, punteggio, eventi)
     fiches += vinto_montepremi
+    # Il ritorno personale: quanto e' tornato indietro, per ogni fiche puntata.
+    dati["fiches_puntate"] += puntata
+    dati["fiches_restituite"] += fiches - (fiches_prima - puntata)
     dati["fiches_attuali"] = fiches
     dati["mani_giocate"] += 1
     dati["mani_dall_ultimo_fallimento"] += 1
@@ -304,6 +336,7 @@ def raddoppio(dati, posta, scommessa, carta, puntata):
         stato["di_fila"] += 1
         stato["fiches_vinte"] += guadagno
         dati["fiches_attuali"] += guadagno
+        dati["fiches_restituite"] += guadagno
         dati["fiches_guadagnate"] += guadagno
         eventi.append(Evento("raddoppio_vinto", f"Indovinato: la posta sale a {formatta_fiches(nuova)} fiches."))
         _record_vincita(dati, nuova - puntata, eventi)
@@ -312,6 +345,7 @@ def raddoppio(dati, posta, scommessa, carta, puntata):
         stato["di_fila"] = 0
         stato["fiches_perse"] += posta
         dati["fiches_attuali"] -= posta
+        dati["fiches_restituite"] -= posta
         dati["fiches_perdute"] += posta
         eventi.append(Evento("raddoppio_perso", f"Sbagliato: perdi la posta di {formatta_fiches(posta)} fiches."))
     fiches = dati["fiches_attuali"]
@@ -356,6 +390,10 @@ def game_over(dati):
     sfide della serie nuova si estraggono alla prima mano.
     """
     serie = dati["mani_dall_ultimo_fallimento"]
+    dati["ultime_serie"] = [
+        *dati["ultime_serie"],
+        {"mani": serie, "fiches_massime": dati["serie"]["fiches_massime"], "fine": adesso()},
+    ][-ULTIME_SERIE:]
     dati["fallimenti"] += 1
     dati["data_ultimo_fallimento"] = adesso()
     dati["mani_dall_ultimo_fallimento"] = 0
