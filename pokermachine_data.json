@@ -1,19 +1,35 @@
 {
-    "versione_formato": 1,
-    "launches": 112,
-    "mani_giocate": 2669,
-    "data_ultimo_fallimento": "2026-09-23 21:38:14",
+    "versione_formato": 2,
+    "launches": 117,
+    "mani_giocate": 2925,
+    "data_ultimo_fallimento": "2026-09-25 22:04:40",
     "record_mani_senza_fallimenti": 399,
-    "mani_dall_ultimo_fallimento": 25,
-    "fiches_guadagnate": 653813,
-    "fiches_perdute": 625896,
-    "fiches_attuali": 309,
-    "fallimenti": 16,
+    "mani_dall_ultimo_fallimento": 31,
+    "fiches_guadagnate": 665135,
+    "fiches_perdute": 637404,
+    "fiches_attuali": 323,
+    "fallimenti": 17,
     "killer_hand_count": 1,
+    "sorpresa_kh": null,
     "soglia_fiches": 0,
     "record_battuto": false,
+    "scudi": 0,
+    "montepremi_centesimi": 17991,
+    "montepremi_vinti": 0,
+    "montepremi_soglia": 0,
+    "mani_pagate": 1538,
+    "fiches_puntate": 17991,
+    "fiches_restituite": 17805,
     "punteggi": {
+        "Cinque gemelle": {
+            "conteggio": 0,
+            "ultima_realizzazione": null
+        },
         "Scala Reale": {
+            "conteggio": 0,
+            "ultima_realizzazione": null
+        },
+        "Full a colore": {
             "conteggio": 0,
             "ultima_realizzazione": null
         },
@@ -21,50 +37,133 @@
             "conteggio": 0,
             "ultima_realizzazione": null
         },
+        "Poker gemello": {
+            "conteggio": 0,
+            "ultima_realizzazione": null
+        },
         "Super Poker": {
             "conteggio": 3,
             "ultima_realizzazione": "2025-04-06 20:16:34"
         },
+        "Poker d'assi": {
+            "conteggio": 0,
+            "ultima_realizzazione": null
+        },
+        "Poker dal 2 al 4": {
+            "conteggio": 1,
+            "ultima_realizzazione": "2026-09-25 21:56:27"
+        },
         "Poker": {
-            "conteggio": 30,
-            "ultima_realizzazione": "2026-09-24 11:27:43"
-        },
-        "Full": {
-            "conteggio": 51,
-            "ultima_realizzazione": "2026-09-23 21:34:02"
-        },
-        "Colore": {
-            "conteggio": 45,
-            "ultima_realizzazione": "2026-09-24 11:24:54"
+            "conteggio": 33,
+            "ultima_realizzazione": "2026-09-25 23:52:46"
         },
         "Scala": {
-            "conteggio": 33,
-            "ultima_realizzazione": "2026-09-18 06:49:23"
+            "conteggio": 35,
+            "ultima_realizzazione": "2026-09-25 18:12:47"
+        },
+        "Tris gemello": {
+            "conteggio": 2,
+            "ultima_realizzazione": "2026-09-25 23:48:56"
+        },
+        "Full": {
+            "conteggio": 53,
+            "ultima_realizzazione": "2026-09-25 18:00:23"
+        },
+        "Colore": {
+            "conteggio": 52,
+            "ultima_realizzazione": "2026-09-25 23:47:34"
         },
         "Tris": {
-            "conteggio": 255,
-            "ultima_realizzazione": "2026-09-24 11:28:13"
+            "conteggio": 284,
+            "ultima_realizzazione": "2026-09-25 23:52:03"
         },
         "Doppia coppia": {
-            "conteggio": 340,
-            "ultima_realizzazione": "2026-09-24 11:28:22"
+            "conteggio": 377,
+            "ultima_realizzazione": "2026-09-25 23:49:54"
+        },
+        "Coppia gemella pagata": {
+            "conteggio": 12,
+            "ultima_realizzazione": "2026-09-25 23:52:12"
         },
         "Coppia pagata": {
-            "conteggio": 636,
-            "ultima_realizzazione": "2026-09-24 11:28:06"
+            "conteggio": 675,
+            "ultima_realizzazione": "2026-09-25 23:51:11"
+        },
+        "Coppia gemella": {
+            "conteggio": 12,
+            "ultima_realizzazione": "2026-09-25 23:50:08"
         },
         "Coppia non pagata": {
-            "conteggio": 554,
-            "ultima_realizzazione": "2026-09-24 11:27:56"
+            "conteggio": 599,
+            "ultima_realizzazione": "2026-09-25 23:52:34"
         },
         "Carta alta": {
-            "conteggio": 722,
-            "ultima_realizzazione": "2026-09-24 11:28:42"
+            "conteggio": 787,
+            "ultima_realizzazione": "2026-09-25 23:51:51"
         }
     },
     "vincita_massima": 195000,
     "data_vincita_massima": "2025-04-06 20:16:34",
     "perdita_massima": 223958,
     "data_perdita_massima": "2025-04-06 20:19:09",
-    "data_ultima_giocata": "2026-09-24 11:28:42"
+    "data_ultima_giocata": "2026-09-25 23:52:46",
+    "serie": {
+        "pagate_di_fila": 1,
+        "ottime_di_fila": 1,
+        "fiches_minime": 93,
+        "fiches_massime": 525,
+        "sfide": [
+            {
+                "chiave": "vinci_killer",
+                "fatta": false
+            },
+            {
+                "chiave": "scala",
+                "fatta": false
+            },
+            {
+                "chiave": "killer_6",
+                "fatta": false
+            }
+        ]
+    },
+    "precisione": {
+        "tenute": 253,
+        "ottime": 242,
+        "di_fila": 1,
+        "valore_perso": 202.66974275954976
+    },
+    "raddoppi": {
+        "tentati": 76,
+        "vinti": 38,
+        "di_fila": 0,
+        "fiches_vinte": 2510,
+        "fiches_perse": 2894
+    },
+    "killer": {
+        "giocate": 10,
+        "vinte": 2,
+        "pareggiate": 1,
+        "perse": 4,
+        "salvate": 3,
+        "bonus": 2404
+    },
+    "ultime_serie": [
+        {
+            "mani": 250,
+            "fiches_massime": 3133,
+            "fine": "2026-09-25 22:04:40"
+        }
+    ],
+    "trofei": {
+        "colore_fiori": "2026-09-25 08:07:40",
+        "colore_picche": "2026-09-25 18:05:57",
+        "killer_5": "2026-09-25 18:09:00",
+        "fiches_1000": "2026-09-25 18:14:55",
+        "tutto_vinto": "2026-09-25 18:14:55",
+        "colore_quadri": "2026-09-25 18:17:32",
+        "killer_9": "2026-09-25 21:58:34",
+        "tris_gemello": "2026-09-25 22:00:51",
+        "cinque_raddoppi": "2026-09-25 23:47:40"
+    }
 }
