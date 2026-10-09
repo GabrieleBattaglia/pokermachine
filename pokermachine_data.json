@@ -1,25 +1,25 @@
 {
     "versione_formato": 2,
-    "launches": 118,
-    "mani_giocate": 2994,
+    "launches": 123,
+    "mani_giocate": 3169,
     "data_ultimo_fallimento": "2026-10-02 09:14:18",
     "record_mani_senza_fallimenti": 399,
-    "mani_dall_ultimo_fallimento": 0,
-    "fiches_guadagnate": 665370,
-    "fiches_perdute": 637962,
-    "fiches_attuali": 200,
+    "mani_dall_ultimo_fallimento": 175,
+    "fiches_guadagnate": 669568,
+    "fiches_perdute": 641791,
+    "fiches_attuali": 569,
     "fallimenti": 18,
-    "killer_hand_count": 0,
+    "killer_hand_count": 7,
     "sorpresa_kh": null,
-    "soglia_fiches": 0,
+    "soglia_fiches": 1000,
     "record_battuto": false,
     "scudi": 0,
-    "montepremi_centesimi": 18709,
-    "montepremi_vinti": 0,
+    "montepremi_centesimi": 6383,
+    "montepremi_vinti": 1,
     "montepremi_soglia": 0,
-    "mani_pagate": 1573,
-    "fiches_puntate": 18709,
-    "fiches_restituite": 18200,
+    "mani_pagate": 1673,
+    "fiches_puntate": 25683,
+    "fiches_restituite": 25543,
     "punteggi": {
         "Cinque gemelle": {
             "conteggio": 0,
@@ -38,8 +38,8 @@
             "ultima_realizzazione": null
         },
         "Poker gemello": {
-            "conteggio": 0,
-            "ultima_realizzazione": null
+            "conteggio": 1,
+            "ultima_realizzazione": "2026-10-03 00:17:07"
         },
         "Super Poker": {
             "conteggio": 3,
@@ -50,12 +50,12 @@
             "ultima_realizzazione": null
         },
         "Poker dal 2 al 4": {
-            "conteggio": 1,
-            "ultima_realizzazione": "2026-09-25 21:56:27"
+            "conteggio": 3,
+            "ultima_realizzazione": "2026-10-04 00:03:59"
         },
         "Poker": {
-            "conteggio": 33,
-            "ultima_realizzazione": "2026-09-25 23:52:46"
+            "conteggio": 34,
+            "ultima_realizzazione": "2026-10-09 08:56:55"
         },
         "Scala": {
             "conteggio": 35,
@@ -66,74 +66,87 @@
             "ultima_realizzazione": "2026-10-02 09:08:04"
         },
         "Full": {
-            "conteggio": 55,
-            "ultima_realizzazione": "2026-10-02 09:09:26"
+            "conteggio": 57,
+            "ultima_realizzazione": "2026-10-09 08:58:32"
         },
         "Colore": {
-            "conteggio": 55,
-            "ultima_realizzazione": "2026-10-02 09:11:58"
+            "conteggio": 59,
+            "ultima_realizzazione": "2026-10-04 00:00:57"
         },
         "Tris": {
-            "conteggio": 291,
-            "ultima_realizzazione": "2026-10-02 09:13:40"
+            "conteggio": 308,
+            "ultima_realizzazione": "2026-10-09 08:59:36"
         },
         "Doppia coppia": {
-            "conteggio": 385,
-            "ultima_realizzazione": "2026-10-02 09:12:09"
+            "conteggio": 416,
+            "ultima_realizzazione": "2026-10-09 08:56:31"
         },
         "Coppia gemella pagata": {
-            "conteggio": 14,
-            "ultima_realizzazione": "2026-10-02 09:10:34"
+            "conteggio": 19,
+            "ultima_realizzazione": "2026-10-04 00:02:23"
         },
         "Coppia pagata": {
-            "conteggio": 685,
-            "ultima_realizzazione": "2026-10-02 09:14:18"
+            "conteggio": 717,
+            "ultima_realizzazione": "2026-10-09 08:59:12"
         },
         "Coppia gemella": {
-            "conteggio": 16,
-            "ultima_realizzazione": "2026-10-02 09:13:33"
+            "conteggio": 23,
+            "ultima_realizzazione": "2026-10-09 08:54:21"
         },
         "Coppia non pagata": {
-            "conteggio": 616,
-            "ultima_realizzazione": "2026-10-02 09:13:50"
+            "conteggio": 644,
+            "ultima_realizzazione": "2026-10-09 09:00:00"
         },
         "Carta alta": {
-            "conteggio": 802,
-            "ultima_realizzazione": "2026-10-02 09:11:13"
+            "conteggio": 847,
+            "ultima_realizzazione": "2026-10-09 09:00:29"
         }
     },
     "vincita_massima": 195000,
     "data_vincita_massima": "2025-04-06 20:16:34",
     "perdita_massima": 223958,
     "data_perdita_massima": "2025-04-06 20:19:09",
-    "data_ultima_giocata": "2026-10-02 09:14:18",
+    "data_ultima_giocata": "2026-10-09 09:00:29",
     "serie": {
         "pagate_di_fila": 0,
-        "ottime_di_fila": 1,
-        "fiches_minime": 200,
-        "fiches_massime": 200,
-        "sfide": []
+        "ottime_di_fila": 176,
+        "fiches_minime": 6,
+        "fiches_massime": 1202,
+        "sfide": [
+            {
+                "chiave": "dieci_ottime",
+                "fatta": true
+            },
+            {
+                "chiave": "poker",
+                "fatta": true
+            },
+            {
+                "chiave": "colore",
+                "fatta": true
+            }
+        ]
     },
     "precisione": {
-        "tenute": 322,
-        "ottime": 305,
-        "di_fila": 5,
+        "tenute": 497,
+        "ottime": 480,
+        "di_fila": 180,
         "valore_perso": 211.34631751348826
     },
     "raddoppi": {
-        "tentati": 94,
-        "vinti": 48,
-        "di_fila": 0,
-        "fiches_vinte": 2580,
-        "fiches_perse": 2928
+        "tentati": 124,
+        "vinti": 67,
+        "di_fila": 9,
+        "fiches_vinte": 3732,
+        "fiches_perse": 3272
     },
     "killer": {
-        "giocate": 13,
-        "vinte": 2,
+        "giocate": 20,
+        "vinte": 4,
         "pareggiate": 1,
-        "perse": 7,
-        "salvate": 3,
-        "bonus": 2404
+        "perse": 9,
+        "salvate": 6,
+        "bonus": 2690
     },
     "ultime_serie": [
         {
@@ -157,6 +170,10 @@
         "killer_9": "2026-09-25 21:58:34",
         "tris_gemello": "2026-09-25 22:00:51",
         "cinque_raddoppi": "2026-09-25 23:47:40",
-        "colore_cuori": "2026-10-02 09:10:50"
+        "colore_cuori": "2026-10-02 09:10:50",
+        "tre_scudi": "2026-10-03 00:17:07",
+        "montepremi": "2026-10-03 00:17:07",
+        "cento_ottime": "2026-10-03 23:59:03",
+        "rimonta": "2026-10-09 08:56:55"
     }
 }
