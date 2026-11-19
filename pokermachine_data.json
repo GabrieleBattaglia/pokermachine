@@ -1,25 +1,25 @@
 {
     "versione_formato": 2,
-    "launches": 125,
-    "mani_giocate": 3182,
+    "launches": 126,
+    "mani_giocate": 3220,
     "data_ultimo_fallimento": "2026-10-02 09:14:18",
     "record_mani_senza_fallimenti": 399,
-    "mani_dall_ultimo_fallimento": 188,
-    "fiches_guadagnate": 670296,
-    "fiches_perdute": 642038,
-    "fiches_attuali": 1050,
+    "mani_dall_ultimo_fallimento": 226,
+    "fiches_guadagnate": 675728,
+    "fiches_perdute": 644864,
+    "fiches_attuali": 3656,
     "fallimenti": 18,
-    "killer_hand_count": 7,
+    "killer_hand_count": 9,
     "sorpresa_kh": null,
     "soglia_fiches": 1000,
     "record_battuto": false,
     "scudi": 0,
-    "montepremi_centesimi": 7095,
+    "montepremi_centesimi": 13646,
     "montepremi_vinti": 1,
     "montepremi_soglia": 0,
-    "mani_pagate": 1683,
-    "fiches_puntate": 26395,
-    "fiches_restituite": 26736,
+    "mani_pagate": 1712,
+    "fiches_puntate": 32946,
+    "fiches_restituite": 35893,
     "punteggi": {
         "Cinque gemelle": {
             "conteggio": 0,
@@ -62,56 +62,56 @@
             "ultima_realizzazione": "2026-09-25 18:12:47"
         },
         "Tris gemello": {
-            "conteggio": 3,
-            "ultima_realizzazione": "2026-10-02 09:08:04"
+            "conteggio": 4,
+            "ultima_realizzazione": "2026-11-19 06:59:34"
         },
         "Full": {
             "conteggio": 57,
             "ultima_realizzazione": "2026-10-09 08:58:32"
         },
         "Colore": {
-            "conteggio": 59,
-            "ultima_realizzazione": "2026-10-04 00:00:57"
+            "conteggio": 61,
+            "ultima_realizzazione": "2026-11-19 07:00:52"
         },
         "Tris": {
-            "conteggio": 310,
-            "ultima_realizzazione": "2026-10-22 23:15:36"
+            "conteggio": 320,
+            "ultima_realizzazione": "2026-11-19 07:02:06"
         },
         "Doppia coppia": {
-            "conteggio": 419,
-            "ultima_realizzazione": "2026-10-22 23:15:00"
+            "conteggio": 423,
+            "ultima_realizzazione": "2026-11-19 07:03:04"
         },
         "Coppia gemella pagata": {
             "conteggio": 22,
             "ultima_realizzazione": "2026-10-22 23:14:46"
         },
         "Coppia pagata": {
-            "conteggio": 718,
-            "ultima_realizzazione": "2026-10-22 23:14:28"
+            "conteggio": 727,
+            "ultima_realizzazione": "2026-11-19 07:02:57"
         },
         "Coppia gemella": {
-            "conteggio": 24,
-            "ultima_realizzazione": "2026-10-09 14:58:23"
+            "conteggio": 27,
+            "ultima_realizzazione": "2026-11-19 07:02:37"
         },
         "Coppia non pagata": {
-            "conteggio": 647,
-            "ultima_realizzazione": "2026-10-22 23:14:20"
+            "conteggio": 651,
+            "ultima_realizzazione": "2026-11-19 07:02:31"
         },
         "Carta alta": {
-            "conteggio": 847,
-            "ultima_realizzazione": "2026-10-09 09:00:29"
+            "conteggio": 852,
+            "ultima_realizzazione": "2026-11-19 07:01:52"
         }
     },
     "vincita_massima": 195000,
     "data_vincita_massima": "2025-04-06 20:16:34",
     "perdita_massima": 223958,
     "data_perdita_massima": "2025-04-06 20:19:09",
-    "data_ultima_giocata": "2026-10-22 23:15:36",
+    "data_ultima_giocata": "2026-11-19 07:03:04",
     "serie": {
-        "pagate_di_fila": 6,
-        "ottime_di_fila": 189,
+        "pagate_di_fila": 3,
+        "ottime_di_fila": 227,
         "fiches_minime": 6,
-        "fiches_massime": 1202,
+        "fiches_massime": 3819,
         "sfide": [
             {
                 "chiave": "dieci_ottime",
@@ -128,23 +128,23 @@
         ]
     },
     "precisione": {
-        "tenute": 510,
-        "ottime": 493,
-        "di_fila": 193,
+        "tenute": 548,
+        "ottime": 531,
+        "di_fila": 231,
         "valore_perso": 211.34631751348826
     },
     "raddoppi": {
-        "tentati": 129,
-        "vinti": 69,
+        "tentati": 140,
+        "vinti": 76,
         "di_fila": 1,
-        "fiches_vinte": 3876,
-        "fiches_perse": 3468
+        "fiches_vinte": 6046,
+        "fiches_perse": 4658
     },
     "killer": {
-        "giocate": 20,
+        "giocate": 22,
         "vinte": 4,
-        "pareggiate": 1,
-        "perse": 9,
+        "pareggiate": 2,
+        "perse": 10,
         "salvate": 6,
         "bonus": 2690
     },
